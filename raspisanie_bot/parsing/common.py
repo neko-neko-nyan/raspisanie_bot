@@ -41,33 +41,6 @@ def parse_group_name(s: str, only_if_matches=False) -> typing.Optional[GroupName
     return GroupName(int(match.group(1)), match.group(2), int(match.group(3)))
 
 
-def parse_time(s: str) -> int:
-    """
-    Переводит строку вида 10:25 в количество минут с 00:00
-    """
-    t = 0
-    d = 1
-
-    for i in s.split(':'):
-        if not i or i.isspace():
-            i = 0
-        else:
-            try:
-                i = int(i)
-            except ValueError:
-                # TODO check
-                return 0
-
-        if d < 0:
-            # TODO check
-            return 0
-
-        t += i * (60 ** d)
-        d -= 1
-
-    return t
-
-
 def download_webpage(url: str) -> html.HtmlElement:
     with requests.get(url) as r:
         page_text = r.text

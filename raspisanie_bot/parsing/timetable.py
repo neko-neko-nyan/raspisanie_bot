@@ -1,10 +1,17 @@
 import dataclasses
+import datetime
+import dateparser
 import re
 
 from .common import normalize_text, parse_pair_number, parse_group_name
 
 from ..database import PairNameFix
 NORM_AUD_RE = re.compile('\\W+')
+DATE_DATA_PARSER = dateparser.DateDataParser(languages=['ru'], region='RU', settings={
+    'PREFER_DAY_OF_MONTH': 'first',
+    'PREFER_DATES_FROM': 'future',
+    'PARSERS': ['absolute-time']
+})
 
 
 @dataclasses.dataclass
@@ -91,24 +98,14 @@ def parse_pair_name(s):
 
 def parse_date(date: str):
     date = date.lower()
+    date = date.replace('знаменатель', '')
+    date = date.replace('числитель', '')
 
-    if 'знаменатель' in date:
-        date = date.replace('знаменатель', '')
-        week = 1
-    elif 'числитель' in date:
-        date = date.replace('числитель', '')
-        week = 0
-    else:
-        week = -1
+    res = DATE_DATA_PARSER.get_date_data(date).date_obj
+    if res is None:
+        return None
 
-    weekday = -1
-    for i, s in enumerate(['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресение']):
-        if s in date:
-            date = date.replace(s, '')
-            weekday = i
-
-    date = date.replace(',', ' ').strip()
-    return date, weekday, week
+    return res.date()
 
 
 def parse_table(table):
@@ -150,7 +147,9 @@ def parse_timetable(page):
             if link:
                 useful_links[text] = link
             elif text:
-                today.add(parse_date(text))
+                date = parse_date(text)
+                if date is not None:
+                    today.add(date)
 
         elif i.tag == 'div':
             timetable.update(parse_table(i[0]))
@@ -165,7 +164,7 @@ def parse_timetable(page):
             print(i)
 
     if not today:
-        today.add('Unknown date')
+        today.add(datetime.date.today())
 
     if len(today) > 1:
         print("Warning: different dates")
