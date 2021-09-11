@@ -2,8 +2,9 @@ import dataclasses
 import datetime
 import dateparser
 import re
+import typing
 
-from .common import normalize_text, parse_pair_number, parse_group_name
+from .common import normalize_text, parse_pair_number, parse_group_name, GroupName
 
 from ..database import PairNameFix
 NORM_AUD_RE = re.compile('\\W+')
@@ -24,7 +25,7 @@ class PairInfo:
     raw: str = None
 
 
-def parse_pair_name(s):
+def parse_pair_name(s) -> typing.Optional[PairInfo]:
     array = NORM_AUD_RE.sub(' ', s).strip().split()
     if not array:
         return None
@@ -96,7 +97,7 @@ def parse_pair_name(s):
     return result
 
 
-def parse_date(date: str):
+def parse_date(date: str) -> typing.Optional[datetime.date]:
     date = date.lower()
     date = date.replace('знаменатель', '')
     date = date.replace('числитель', '')
@@ -108,7 +109,7 @@ def parse_date(date: str):
     return res.date()
 
 
-def parse_table(table):
+def parse_table(table) -> typing.Dict[GroupName, typing.Dict[int, PairInfo]]:
     timetable = []
 
     if table[0].tag == 'tbody':
@@ -132,7 +133,8 @@ def parse_table(table):
     return dict(timetable)
 
 
-def parse_timetable(page):
+def parse_timetable(page) -> typing.Tuple[datetime.date, typing.Dict[str, str],
+                                          typing.Dict[GroupName, typing.Dict[int, PairInfo]]]:
     useful_links = {}
     today = set()
     timetable = {}
