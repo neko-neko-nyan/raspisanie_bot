@@ -1,18 +1,21 @@
 import dataclasses
 import datetime
-import dateparser
+import logging
 import re
 import typing
 
-from .common import normalize_text, parse_pair_number, parse_group_name, GroupName
+import dateparser
 
+from .common import normalize_text, parse_pair_number, parse_group_name, GroupName
 from ..database import PairNameFix
+
 NORM_AUD_RE = re.compile('\\W+')
 DATE_DATA_PARSER = dateparser.DateDataParser(languages=['ru'], region='RU', settings={
     'PREFER_DAY_OF_MONTH': 'first',
     'PREFER_DATES_FROM': 'future',
     'PARSERS': ['absolute-time']
 })
+_LOG = logging.getLogger('parsing')
 
 
 @dataclasses.dataclass
@@ -98,9 +101,7 @@ def parse_pair_name(s) -> typing.Optional[PairInfo]:
 
 
 def parse_date(date: str) -> typing.Optional[datetime.date]:
-    date = date.lower()
-    date = date.replace('знаменатель', '')
-    date = date.replace('числитель', '')
+    date = date.lower().replace('знаменатель', '').replace('числитель', '')
 
     res = DATE_DATA_PARSER.get_date_data(date).date_obj
     if res is None:
@@ -163,13 +164,13 @@ def parse_timetable(page) -> typing.Tuple[datetime.date, typing.Dict[str, str],
             continue
 
         else:
-            print(i)
+            _LOG.warning("Unhandled element in timetable: %r (text=%r)", i.tag, i.text_content())
 
     if not today:
         today.add(datetime.date.today())
 
     if len(today) > 1:
-        print("Warning: different dates")
+        _LOG.warning("Different dates in timetable: %s (first is used)", ', '.join((repr(i) for i in today)))
 
     today = today.pop()
 

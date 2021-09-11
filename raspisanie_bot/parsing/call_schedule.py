@@ -1,9 +1,11 @@
+import logging
 import re
 import typing
 
 from .common import parse_pair_number, TimePeriod
 
 NORM_TIME_RE = re.compile('\\s*(\\d+)[.,:](\\d+)\\s*.\\s*(\\d+)[.,:](\\d+)\\s*')
+_LOG = logging.getLogger('parsing')
 
 
 def parse_call_schedule(page) -> typing.Dict[int, TimePeriod]:
@@ -15,7 +17,7 @@ def parse_call_schedule(page) -> typing.Dict[int, TimePeriod]:
     pair_info = {}
     last_pn = 0
 
-    for tr in table:
+    for rn, tr in enumerate(table):
         col1 = tr[0].text_content()
         if col1.isspace():
             continue
@@ -25,14 +27,13 @@ def parse_call_schedule(page) -> typing.Dict[int, TimePeriod]:
 
         col2 = tr[1].text_content()
         match = NORM_TIME_RE.fullmatch(col2)
-        if match:
-            start = int(match.group(1)) * 60 + int(match.group(2))
-            end = int(match.group(3)) * 60 + int(match.group(4))
-            pair_info[pn] = TimePeriod(start, end)
+        if match is None:
+            _LOG.warning("Time re not matches: %r", col2, )
+            _LOG.info("NOTE: While parsing row %s, pair number %s", rn, pn)
+            continue
 
-        else:
-            print(f"Warning: cant parse time: {col2}")
+        start = int(match.group(1)) * 60 + int(match.group(2))
+        end = int(match.group(3)) * 60 + int(match.group(4))
+        pair_info[pn] = TimePeriod(start, end)
 
     return pair_info
-
-"http://novkrp.ru/index.php/studentam/79-sample-data-articles/joomla/studentam/122-raspisanie-zvonkov"

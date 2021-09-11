@@ -2,7 +2,6 @@ import io
 import re
 import typing
 
-import requests
 from pdfminer.converter import PDFLayoutAnalyzer
 from pdfminer.layout import LTPage, LTTextLine, LTTextBox, LAParams, LTChar, LTText
 from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
@@ -78,13 +77,3 @@ def parse_cvp_pdf(content: bytes) -> typing.List[str]:
 
 def parse_cvp(content: bytes) -> typing.Dict[GroupName, TimePeriod]:
     return parse_cvp_table(parse_cvp_pdf(content))
-
-
-def parse_covid_pit(url: str) -> typing.Dict[GroupName, TimePeriod]:
-    with requests.get(url) as r:
-        content = r.content
-
-    return parse_cvp(content)
-
-
-"http://www.novkrp.ru/data/covid_pit.pdf"
