@@ -3,6 +3,7 @@ import re
 
 from .common import normalize_text, parse_pair_number, parse_group_name
 
+from ..database import PairNameFix
 NORM_AUD_RE = re.compile('\\W+')
 
 
@@ -78,6 +79,13 @@ def parse_pair_name(s):
             index += 1
 
     result.name = ' '.join(array)
+    if result.name.startswith('МДК'):
+        result.name = 'МДК.' + '.'.join(result.name.removeprefix('МДК').strip().split())
+
+    fix = PairNameFix.get_or_none(PairNameFix.prev_name == result.name.lower())
+    if fix is not None:
+        result.name = fix.new_name
+
     return result
 
 

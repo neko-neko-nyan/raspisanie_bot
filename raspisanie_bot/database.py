@@ -89,3 +89,12 @@ class User(BaseModel):
 class Settings(BaseModel):
     name = CharField(64, primary_key=True)
     value = BareField(null=True)
+
+
+class PairNameFix(BaseModel):
+    prev_name = CharField(64, primary_key=True)
+    new_name = CharField(64)
+
+
+db.create_tables((Teacher, Group, Cabinet, PairTime, Pair, User, Settings, PairNameFix, Pair.teachers.through_model,
+                  Pair.cabinets.through_model))
