@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import logging
 
 import aiohttp
 from lxml import html
@@ -8,6 +9,7 @@ from raspisanie_bot import parse_timetable, parse_call_schedule, parse_cvp
 from raspisanie_bot.database import Settings, PairTime, Pair, Group, db
 
 SESSION = aiohttp.ClientSession()
+_LOG = logging.getLogger("updater")
 
 
 async def download_content(url):
@@ -36,6 +38,8 @@ async def download_webpage_if_not_cached(url, key):
 
 
 async def update_cvp(today, url):
+    _LOG.info("Updating CVP started")
+
     async with SESSION.get(url) as r:
         content = await r.read()
 
@@ -44,10 +48,15 @@ async def update_cvp(today, url):
     for group, (start, end) in cvp.items():
         pass
 
+    _LOG.info("CVP updated successfully")
+
 
 async def update_call_schedule(today, url):
+    _LOG.info("Updating call schedule started")
+
     page = await download_webpage_if_not_cached(url, "call_schedule")
     if page is None:
+        _LOG.info("Call schedule not updated due to cache")
         return
 
     call_schedule = parse_call_schedule(page)
@@ -58,13 +67,20 @@ async def update_call_schedule(today, url):
         for pn, (start, end) in call_schedule.items():
             PairTime.create(date=today, pair_number=pn, start_time=start, end_time=end)
 
+    _LOG.info("Call schedule updated successfully")
+
 
 async def update_timetable():
+    _LOG.info("Updating timetable started")
+
     page = await download_webpage_if_not_cached("http://novkrp.ru/raspisanie.htm", "timetable")
     if page is None:
+        _LOG.info("Timetable not updated due to cache")
         return
 
     today, useful_links, timetable = parse_timetable(page)
+
+    _LOG.info("Timetable for %r, %s links", today, len(useful_links))
 
     for name, url in useful_links.items():
         name = name.lower()
@@ -87,6 +103,8 @@ async def update_timetable():
                     g = Group.create(course=group.course, group=group.group, subgroup=group.subgroup)
 
                 Pair.create(time=time, group=g, name=info.name, teachers=[], cabinets=[])
+
+    _LOG.info("Timetable updated successfully")
 
 
 async def main():
