@@ -1,3 +1,4 @@
+import re
 import typing
 
 from .common import parse_pair_number, TimePeriod
