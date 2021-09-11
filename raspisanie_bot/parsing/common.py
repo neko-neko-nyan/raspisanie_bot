@@ -2,9 +2,6 @@ import collections
 import re
 import typing
 
-import requests
-from lxml import html
-
 NORM_TEXT_RE = re.compile('\\s+')
 NOT_DIGITS_RE = re.compile('\\D+')
 GROUP_NAME_RE = re.compile('\\s*(\\d)\\s*-?\\s*([А-Я]{1,2})\\s*-?\\s*(\\d)\\s*', re.MULTILINE)
@@ -39,11 +36,3 @@ def parse_group_name(s: str, only_if_matches=False) -> typing.Optional[GroupName
         return GroupName(0, normalize_text(s), 1)
 
     return GroupName(int(match.group(1)), match.group(2), int(match.group(3)))
-
-
-def download_webpage(url: str) -> html.HtmlElement:
-    with requests.get(url) as r:
-        page_text = r.text
-
-    page = html.fromstring(page_text)
-    return page
