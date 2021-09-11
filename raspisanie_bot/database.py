@@ -44,9 +44,6 @@ class PairTime(BaseModel):
     start_time = IntegerField()
     end_time = IntegerField()
 
-    class Meta:
-        primary_key = CompositeKey('pair_number', 'date')
-
 
 class Pair(BaseModel):
     time = ForeignKeyField(PairTime)
