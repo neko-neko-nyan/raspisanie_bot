@@ -58,6 +58,11 @@ class Pair(BaseModel):
 class User(BaseModel):
     tg_id = IntegerField(primary_key=True)
 
+    invited_by = ForeignKeyField('self', null=True)
+    invite_code = IntegerField(null=True)
+
+    is_admin = BooleanField(default=False)
+
     group = ForeignKeyField(Group, null=True)
     teacher = ForeignKeyField(Teacher, null=True)
 
@@ -82,6 +87,24 @@ class User(BaseModel):
 
     pre_pair_start_time = IntegerField(default=0)
     pre_cvp_start_time = IntegerField(default=0)
+
+    @classmethod
+    def from_telegram(cls, telegram_user):
+        user = User.get_or_none(User.tg_id == telegram_user.id)
+        if user is not None:
+            user.last_activity = datetime.datetime.now()
+            user.save()
+            return user
+
+        return User.create(tg_id=telegram_user.id)
+
+    def is_configured(self):
+        return self.group is not None or self.teacher is not None
+
+
+class Invite(BaseModel):
+    id = IntegerField(primary_key=True)
+    created_by = ForeignKeyField(User)
 
 
 class Settings(BaseModel):
