@@ -1,10 +1,11 @@
 import aiogram
 
+from raspisanie_bot.bot_errors import bot_error
 from raspisanie_bot.database import User
 
 
 async def do_search(message: aiogram.types.Message, user, text):
-    await message.answer(f"В разработке (текст = {text!r})")
+    await message.answer(f"В разработке (search; текст = {text!r})")
 
 
 async def cmd_search(message: aiogram.types.Message):
@@ -27,8 +28,7 @@ async def cmd_search_me(message: aiogram.types.Message):
         await do_search(message, user, user.teacher.full_name)
 
     else:
-        await message.answer("Вы не можете использовать эту команду так как Вы не указали свою группу / ФИО. Сначала "
-                             "укажите свои данные через /settings. (код = 1, данные = )")
+        bot_error("NOT_CONFIGURED", user=user.tg_id)
 
 
 def install_search(dp):

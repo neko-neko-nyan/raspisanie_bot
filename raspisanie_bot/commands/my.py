@@ -1,5 +1,6 @@
 import aiogram
 
+from raspisanie_bot.bot_errors import bot_error
 from raspisanie_bot.database import User
 
 
@@ -7,9 +8,7 @@ async def cmd_my(message: aiogram.types.Message):
     user = User.from_telegram(message.from_user)
 
     if not user.is_configured():
-        await message.answer("Вы не можете использовать эту команду так как Вы не указали свою группу / ФИО. Сначала "
-                             "укажите свои данные через /settings. (код = 1, данные = )")
-        return
+        bot_error("NOT_CONFIGURED", user=user.tg_id)
 
     await message.answer("В разработке")
 
