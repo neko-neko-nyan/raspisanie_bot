@@ -1,8 +1,8 @@
 import aiogram
 import jwt
 
+from . import config
 
-ERROR_DATA_JWT_KEY = b"ERROR CODE"
 ERRORS = {
     "UNKNOWN_ERROR": [0, "Произошла ошибка во время обработки ошибки. Сообщите об этом администратору."],
     "NOT_CONFIGURED": [1, "Вы не указали группу / ФИО. Команда /settings должна помочь вам."],
@@ -40,7 +40,7 @@ def format_error(name, exception: BaseException = None, **data):
         data["exc_args"] = list(exception.args)
 
     data["error_code"] = error[0]
-    data = jwt.encode(data, ERROR_DATA_JWT_KEY)
+    data = jwt.encode(data, config.JWT_KEY)
     return error[1] + f" (код = {error[0]}, данные для разработчиков = {data})"
 
 

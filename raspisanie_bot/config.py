@@ -1,9 +1,9 @@
 import os
 import random
 
-JWT_TOKEN = os.getenv("JWT_TOKEN")
-if not JWT_TOKEN:
-    JWT_TOKEN = random.randbytes(64)
+JWT_KEY = os.getenv("JWT_KEY")
+if not JWT_KEY:
+    JWT_KEY = random.randbytes(64)
 
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
