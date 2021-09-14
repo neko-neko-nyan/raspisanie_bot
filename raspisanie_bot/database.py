@@ -59,7 +59,7 @@ class User(BaseModel):
     tg_id = IntegerField(primary_key=True)
 
     invited_by = ForeignKeyField('self', null=True)
-    invite_code = IntegerField(null=True)
+    invite = IntegerField(null=True)
 
     is_admin = BooleanField(default=False)
 
@@ -105,6 +105,7 @@ class User(BaseModel):
 class Invite(BaseModel):
     id = IntegerField(primary_key=True)
     created_by = ForeignKeyField(User)
+    is_used = BooleanField(default=False)
 
 
 class Settings(BaseModel):
@@ -117,5 +118,5 @@ class PairNameFix(BaseModel):
     new_name = CharField(64)
 
 
-db.create_tables((Teacher, Group, Cabinet, PairTime, Pair, User, Settings, PairNameFix, Pair.teachers.through_model,
-                  Pair.cabinets.through_model))
+db.create_tables((Teacher, Group, Cabinet, PairTime, Pair, User, Invite, Settings, PairNameFix,
+                  Pair.teachers.through_model, Pair.cabinets.through_model))
