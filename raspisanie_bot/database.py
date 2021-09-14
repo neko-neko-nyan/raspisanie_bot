@@ -1,3 +1,4 @@
+import datetime
 import pathlib
 
 from peewee import *
@@ -60,8 +61,8 @@ class User(BaseModel):
     group = ForeignKeyField(Group, null=True)
     teacher = ForeignKeyField(Teacher, null=True)
 
-    first_activity = DateTimeField()
-    last_activity = DateTimeField()
+    first_activity = DateTimeField(default=datetime.datetime.now)
+    last_activity = DateTimeField(default=datetime.datetime.now)
 
     notification_flags = BitField()
 
@@ -79,8 +80,8 @@ class User(BaseModel):
     notify_cvp_start = notification_flags.flag()
     notify_cvp_end = notification_flags.flag()
 
-    pre_pair_start_time = IntegerField()
-    pre_cvp_start_time = IntegerField()
+    pre_pair_start_time = IntegerField(default=0)
+    pre_cvp_start_time = IntegerField(default=0)
 
 
 class Settings(BaseModel):
