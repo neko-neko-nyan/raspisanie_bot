@@ -20,6 +20,14 @@ class Teacher(BaseModel):
     name = CharField(max_length=64)
     patronymic = CharField(max_length=64)
 
+    @property
+    def full_name(self):
+        return f"{self.surname} {self.name} {self.patronymic}".capitalize()
+
+    @property
+    def short_name(self):
+        return f"{self.surname} {self.name[0]}. {self.patronymic[0]}.".capitalize()
+
 
 class Group(BaseModel):
     id = AutoField()
@@ -28,6 +36,13 @@ class Group(BaseModel):
     course = IntegerField()
     group = CharField(max_length=8)
     subgroup = IntegerField()
+
+    @property
+    def string_value(self):
+        if self.course == 0:
+            return self.group.upper()
+
+        return f"{self.course}-{self.group.upper()}-{self.subgroup}"
 
 
 class Cabinet(BaseModel):
