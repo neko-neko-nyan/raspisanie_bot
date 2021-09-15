@@ -35,7 +35,7 @@ async def cmd_settings(message: aiogram.types.Message, state: FSMContext):
     await state.reset_state()
 
 
-class Settings(StatesGroup):
+class SettingsStates(StatesGroup):
     waiting_for_group = State()
     waiting_for_teacher = State()
 
@@ -43,10 +43,10 @@ class Settings(StatesGroup):
 async def cc_settings_set_group_teacher(call: aiogram.types.CallbackQuery, callback_data):
     if callback_data["action"] == "set_group":
         await call.message.edit_text("Отправьте номер группы")
-        await Settings.waiting_for_group.set()
+        await SettingsStates.waiting_for_group.set()
     else:
         await call.message.edit_text("Отправьте Ваше ФИО")
-        await Settings.waiting_for_teacher.set()
+        await SettingsStates.waiting_for_teacher.set()
 
     await call.answer()
 
@@ -93,6 +93,6 @@ def install_settings(dp):
     dp.register_message_handler(cmd_settings, commands="settings", state='*')
     dp.register_callback_query_handler(cc_settings_set_group_teacher,
                                        settings_cb.filter(action=["set_group", "set_teacher"]))
-    dp.register_message_handler(msg_settings_set_group, state=Settings.waiting_for_group)
-    dp.register_message_handler(msg_settings_set_teacher, state=Settings.waiting_for_teacher)
+    dp.register_message_handler(msg_settings_set_group, state=SettingsStates.waiting_for_group)
+    dp.register_message_handler(msg_settings_set_teacher, state=SettingsStates.waiting_for_teacher)
     dp.register_callback_query_handler(cc_settings_notifications, settings_cb.filter(action=["notifications"]))

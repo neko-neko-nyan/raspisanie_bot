@@ -4,6 +4,7 @@ import aiogram
 import jwt
 import qrcode
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 from aiogram.utils.callback_data import CallbackData
 
@@ -34,6 +35,7 @@ def create_invite(user, group_name=None, teacher_name=None, is_admin=False):
         invite_data["gri"] = group.id
 
     if teacher_name:
+        # TODO: search teacher
         teacher = Teacher.get_or_none(teacher_name)
         if teacher is None:
             bot_error("INVALID_TEACHER", teacher=teacher_name)
@@ -106,6 +108,11 @@ async def cc_invite_set_admin(call: aiogram.types.CallbackQuery, callback_data):
                                    not callback_data["is_admin"])
     await call.answer()
     await call.message.edit_text(text, reply_markup=kb)
+
+
+class InviteStates(StatesGroup):
+    waiting_for_group = State()
+    waiting_for_teacher = State()
 
 
 async def cc_invite_set_group(call: aiogram.types.CallbackQuery, callback_data):

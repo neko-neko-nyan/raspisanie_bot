@@ -53,7 +53,7 @@ async def do_search(message: aiogram.types.Message, user, text):
     bot_error("NOT_FOUND", user=user.tg_id, text=text)
 
 
-class Search(StatesGroup):
+class SearchStates(StatesGroup):
     waiting_for_text = State()
 
 
@@ -66,7 +66,7 @@ async def cmd_search(message: aiogram.types.Message, state: FSMContext):
 
     else:
         await message.answer("Введите текст поиска (преподаватель, группа или кабинет)")
-        await Search.waiting_for_text.set()
+        await SearchStates.waiting_for_text.set()
 
 
 async def msg_search_text(message: aiogram.types.Message, state: FSMContext):
@@ -93,4 +93,4 @@ async def cmd_search_me(message: aiogram.types.Message, state: FSMContext):
 def install_search(dp):
     dp.register_message_handler(cmd_search, commands="search", state='*')
     dp.register_message_handler(cmd_search_me, commands="search_me", state='*')
-    dp.register_message_handler(msg_search_text, state=Search.waiting_for_text)
+    dp.register_message_handler(msg_search_text, state=SearchStates.waiting_for_text)
