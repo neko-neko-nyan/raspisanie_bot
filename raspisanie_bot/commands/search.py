@@ -12,11 +12,11 @@ async def do_search_cabinet(message: aiogram.types.Message, user, cabinet):
 
 
 async def do_search_group(message: aiogram.types.Message, user, group):
-    await message.answer("В разработке (do_search_cabinet)")
+    await message.answer("В разработке (do_search_group)")
 
 
 async def do_search_teacher(message: aiogram.types.Message, user, teacher):
-    await message.answer("В разработке (do_search_cabinet)")
+    await message.answer("В разработке (do_search_teacher)")
 
 
 async def do_search(message: aiogram.types.Message, user, text):
