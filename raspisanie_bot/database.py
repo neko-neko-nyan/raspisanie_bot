@@ -118,5 +118,19 @@ class PairNameFix(BaseModel):
     new_name = CharField(64)
 
 
-db.create_tables((Teacher, Group, Cabinet, PairTime, Pair, User, Invite, Settings, PairNameFix,
-                  Pair.teachers.through_model, Pair.cabinets.through_model))
+class StorageState(BaseModel):
+    id = CharField(64, primary_key=True)
+    state = CharField(64, null=True)
+
+
+class StorageData(BaseModel):
+    id = CharField(64)
+    key = CharField(64)
+    state = BareField()
+
+    class Meta:
+        primary_key = CompositeKey('id', 'key')
+
+
+db.create_tables((Teacher, Group, Cabinet, PairTime, Pair, User, Invite, Settings, PairNameFix, StorageState,
+                  StorageData, Pair.teachers.through_model, Pair.cabinets.through_model))
