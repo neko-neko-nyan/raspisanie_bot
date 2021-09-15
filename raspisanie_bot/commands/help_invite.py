@@ -3,6 +3,7 @@ import io
 import aiogram
 import jwt
 import qrcode
+from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 from aiogram.utils.callback_data import CallbackData
 
@@ -51,7 +52,7 @@ def create_invite(user, group_name=None, teacher_name=None, is_admin=False):
     return InputFile(fp, "qrcode.png"), link
 
 
-async def cmd_start(message: aiogram.types.Message):
+async def cmd_start(message: aiogram.types.Message, state: FSMContext):
     user = User.from_telegram(message.from_user)
 
     args = message.get_args()
@@ -95,11 +96,13 @@ async def cmd_start(message: aiogram.types.Message):
             await message.reply("Код приглашения активирован успешно")
 
     await send_help(message, user)
+    await state.reset_state()
 
 
-async def cmd_help(message: aiogram.types.Message):
+async def cmd_help(message: aiogram.types.Message, state: FSMContext):
     user = User.from_telegram(message.from_user)
     await send_help(message, user)
+    await state.reset_state()
 
 
 invite_cb = CallbackData("invite", "action", "group", "teacher", "is_admin")
@@ -133,7 +136,7 @@ def make_invite_message(user, group=None, teacher=None, is_admin=False):
     return ''.join(text), kb
 
 
-async def cmd_invite(message: aiogram.types.Message):
+async def cmd_invite(message: aiogram.types.Message, state: FSMContext):
     user = User.from_telegram(message.from_user)
     args = message.get_args().split()
 
@@ -146,6 +149,8 @@ async def cmd_invite(message: aiogram.types.Message):
     else:
         text, kb = make_invite_message(user)
         await message.answer(text, reply_markup=kb)
+
+    await state.reset_state()
 
 
 async def cc_invite_set_admin(call: aiogram.types.CallbackQuery, callback_data):
@@ -175,9 +180,9 @@ async def cc_invite_create(call: aiogram.types.CallbackQuery, callback_data):
 
 
 def install_help_invite(dp):
-    dp.register_message_handler(cmd_start, commands="start")
-    dp.register_message_handler(cmd_help, commands="help")
-    dp.register_message_handler(cmd_invite, commands="invite")
+    dp.register_message_handler(cmd_start, commands="start", state='*')
+    dp.register_message_handler(cmd_help, commands="help", state='*')
+    dp.register_message_handler(cmd_invite, commands="invite", state='*')
     dp.register_callback_query_handler(cc_invite_set_admin, invite_cb.filter(action="set_admin"))
     dp.register_callback_query_handler(cc_invite_set_group, invite_cb.filter(action="set_group"))
     dp.register_callback_query_handler(cc_invite_set_teacher, invite_cb.filter(action="set_teacher"))
