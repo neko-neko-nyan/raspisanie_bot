@@ -58,12 +58,11 @@ class Search(StatesGroup):
 
 
 async def cmd_search(message: aiogram.types.Message, state: FSMContext):
-    await state.reset_state()
-
     user = User.from_telegram(message.from_user)
     args = message.get_args()
     if args:
         await do_search(message, user, args)
+        await state.reset_state()
 
     else:
         await message.answer("Введите текст поиска (преподаватель, группа или кабинет)")
@@ -77,8 +76,6 @@ async def msg_search_text(message: aiogram.types.Message, state: FSMContext):
 
 
 async def cmd_search_me(message: aiogram.types.Message, state: FSMContext):
-    await state.reset_state()
-
     user = User.from_telegram(message.from_user)
 
     if user.group is not None:
@@ -89,6 +86,8 @@ async def cmd_search_me(message: aiogram.types.Message, state: FSMContext):
 
     else:
         bot_error("NOT_CONFIGURED", user=user.tg_id)
+
+    await state.reset_state()
 
 
 def install_search(dp):
