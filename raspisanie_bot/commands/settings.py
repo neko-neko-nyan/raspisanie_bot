@@ -54,8 +54,12 @@ async def cc_settings_set_group_teacher(call: aiogram.types.CallbackQuery, callb
 async def msg_settings_set_group(message: aiogram.types.Message, state: FSMContext):
     user = User.from_telegram(message.from_user)
 
-    course, group, subgroup = parse_group_name(message.text)
-    group = Group.get_or_none(Group.course == course, Group.group == group, Group.subgroup == subgroup)
+    group = parse_group_name(message.text, only_if_matches=True)
+    if group is None:
+        bot_error("INVALID_GROUP", user=user.tg_id, group=message.text)
+
+    group = Group.get_or_none(Group.course == group.course, Group.group == group.group,
+                              Group.subgroup == group.subgroup)
     if group is None:
         bot_error("INVALID_GROUP", user=user.tg_id, group=message.text)
 

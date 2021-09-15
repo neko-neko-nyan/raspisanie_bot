@@ -22,8 +22,12 @@ def create_invite(user, group_name=None, teacher_name=None, is_admin=False):
         invite_data["isa"] = True
 
     if group_name:
-        course, group, subgroup = parse_group_name(group_name)
-        group = Group.get_or_none(Group.course == course, Group.group == group, Group.subgroup == subgroup)
+        group = parse_group_name(group_name, only_if_matches=True)
+        if group is None:
+            bot_error("INVALID_GROUP", group=group_name)
+
+        group = Group.get_or_none(Group.course == group.course, Group.group == group.group,
+                                  Group.subgroup == group.subgroup)
         if group is None:
             bot_error("INVALID_GROUP", group=group_name)
 
