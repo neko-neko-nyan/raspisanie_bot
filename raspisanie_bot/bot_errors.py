@@ -1,5 +1,6 @@
 import aiogram
 import jwt
+from aiogram.utils.markdown import escape_md
 
 from . import config
 
@@ -10,6 +11,7 @@ ERRORS = {
 
     "INVALID_GROUP": [3, "Такой группы не найдено."],
     "INVALID_TEACHER": [4, "Такого преподавателя не найдено."],
+    "NOT_FOUND": [5, "По Вашему запросу ничего не найдено."],
 
     "JWT_ERROR": [10, "Это приглашение содержит ошибку или недействительно."],
     "ANOTHER_INVITE_USED": [11, "Вы уже использовали код приглашения однажды. Чтобы использовать другой код надо чтобы"
@@ -41,7 +43,7 @@ def format_error(name, exception: BaseException = None, **data):
 
     data["error_code"] = error[0]
     data = jwt.encode(data, config.JWT_KEY)
-    return error[1] + f" (код = {error[0]}, данные для разработчиков = {data})"
+    return f"{escape_md(error[1])}\n```\nКод ошибки: {error[0]}\nДанные для разработчиков: {escape_md(data)}\n```\n"
 
 
 async def handle_jwt_error(update: aiogram.types.Update, exception: jwt.PyJWTError):
@@ -52,7 +54,7 @@ async def handle_jwt_error(update: aiogram.types.Update, exception: jwt.PyJWTErr
         else:
             return False
 
-    await message.answer(format_error("JWT_ERROR", exception))
+    await message.answer(format_error("JWT_ERROR", exception), parse_mode="MarkdownV2")
     return True
 
 
@@ -64,7 +66,7 @@ async def handle_bot_error(update: aiogram.types.Update, exception: BotError):
         else:
             return False
 
-    await message.answer(format_error(exception.name, exception.exception, **exception.data))
+    await message.answer(format_error(exception.name, exception.exception, **exception.data), parse_mode="MarkdownV2")
     return True
 
 
