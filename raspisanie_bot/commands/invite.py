@@ -70,7 +70,12 @@ def make_invite_message(user, data=None):
            InlineKeyboardButton("Преподаватель", callback_data=invite_cb.new("set_teacher")))
 
     if user.is_admin:
-        kb.add(InlineKeyboardButton("Сделать администратором", callback_data=invite_cb.new("set_admin")))
+        if data.get("isa"):
+            text = "Не делать администратором"
+        else:
+            text = "Сделать администратором"
+
+        kb.add(InlineKeyboardButton(text, callback_data=invite_cb.new("set_admin")))
 
     kb.add(InlineKeyboardButton("Создать", callback_data=invite_cb.new("create")))
 
@@ -123,7 +128,13 @@ async def cc_invite_set_admin(call: aiogram.types.CallbackQuery, state: FSMConte
 
     text, kb = make_invite_message(user, data)
     await call.bot.edit_message_text(text, call.message.chat.id, data["msg_id"], reply_markup=kb)
-    await call.answer()
+
+    if data["isa"]:
+        text = "Пользоваель станет администратором"
+    else:
+        text = "Пользоваель не станет администратором"
+
+    await call.answer(text)
 
 
 async def cc_invite_set_group(call: aiogram.types.CallbackQuery):

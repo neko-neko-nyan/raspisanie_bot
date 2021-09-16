@@ -9,3 +9,6 @@ if not JWT_KEY:
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
     exit("Error: no token provided")
+
+
+ENABLE_DEBUG_DATA = True

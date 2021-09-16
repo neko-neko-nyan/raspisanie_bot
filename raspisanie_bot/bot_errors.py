@@ -37,6 +37,9 @@ def format_error(name, exception: BaseException = None, **data):
         error = ERRORS["UNKNOWN_ERROR"]
         data["error_name"] = name
 
+    if not config.ENABLE_DEBUG_DATA:
+        return escape_md(error[1])
+
     if exception is not None:
         data["exc_type"] = type(exception).__name__
         data["exc_args"] = list(exception.args)
