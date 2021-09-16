@@ -25,18 +25,6 @@ async def download_webpage(url):
     return html.fromstring(content.decode(encoding))
 
 
-async def download_webpage_if_not_cached(url, key):
-    content, encoding = await download_content(url)
-
-    md5 = hashlib.md5(content).digest()
-    value = Settings.get_or_none(Settings.name == f"last-md5.{key}", Settings.value == md5)
-    if value is not None:
-        return None
-
-    Settings.create(name=f"last-md5.{key}", value=md5)
-    return html.fromstring(content.decode(encoding))
-
-
 async def update_cvp(today, url):
     _LOG.info("Updating CVP started")
 
@@ -54,7 +42,7 @@ async def update_cvp(today, url):
 async def update_call_schedule(today, url):
     _LOG.info("Updating call schedule started")
 
-    page = await download_webpage_if_not_cached(url, "call_schedule")
+    page = await download_webpage(url)
     if page is None:
         _LOG.info("Call schedule not updated due to cache")
         return
@@ -73,10 +61,16 @@ async def update_call_schedule(today, url):
 async def update_timetable():
     _LOG.info("Updating timetable started")
 
-    page = await download_webpage_if_not_cached("http://novkrp.ru/raspisanie.htm", "timetable")
-    if page is None:
+    content, encoding = await download_content("http://novkrp.ru/raspisanie.htm")
+
+    md5 = hashlib.md5(content).digest()
+    value = Settings.get_or_create(name=f"last-timetable-md5")[0]
+    if value.value == md5:
         _LOG.info("Timetable not updated due to cache")
         return
+
+    value.value = md5
+    page = html.fromstring(content.decode(encoding))
 
     today, useful_links, timetable = parse_timetable(page)
 
@@ -105,6 +99,7 @@ async def update_timetable():
                 Pair.create(time=time, group=g, name=info.name, teachers=[], cabinets=[])
 
     _LOG.info("Timetable updated successfully")
+    value.save()
 
 
 async def main():

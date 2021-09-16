@@ -15,10 +15,10 @@ async def cmd_settings(message: aiogram.types.Message, state: FSMContext):
 
     kb = InlineKeyboardMarkup()
 
-    kb.add(InlineKeyboardButton("Группа", callback_data=settings_cb.new("set_group")),
+    kb.add(InlineKeyboardButton("Студент", callback_data=settings_cb.new("set_group")),
            InlineKeyboardButton("Преподаватель", callback_data=settings_cb.new("set_teacher")))
 
-    kb.add(InlineKeyboardButton("Уведомления", callback_data=settings_cb.new("notifications")))
+    # kb.add(InlineKeyboardButton("Уведомления", callback_data=settings_cb.new("notifications")))
 
     text = ["Тип: "]
     if user.group:
@@ -73,7 +73,7 @@ async def msg_settings_set_teacher(message: aiogram.types.Message, state: FSMCon
 
 
 async def cc_settings_notifications(call: aiogram.types.CallbackQuery):
-    await call.answer("В разработке (cc_settings_notifications)", show_alert=True)
+    await call.answer("В разработке (notifications)", show_alert=True)
 
 
 def install_settings(dp):

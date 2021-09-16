@@ -30,6 +30,7 @@ async def main():
 
         aiogram.types.BotCommand("/invite", "Создать ссылку-приглашение"),
 
+        aiogram.types.BotCommand("/cancel", "Отмена действия"),
         aiogram.types.BotCommand("/settings", "Настройки"),
         aiogram.types.BotCommand("/help", "Справка"),
         aiogram.types.BotCommand("/start", "Справка, использовать код приглашения"),

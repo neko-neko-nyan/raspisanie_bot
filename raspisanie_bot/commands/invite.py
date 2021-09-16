@@ -66,7 +66,7 @@ def make_invite_message(user, data=None):
         data = {}
 
     kb = InlineKeyboardMarkup()
-    kb.add(InlineKeyboardButton("Группа", callback_data=invite_cb.new("set_group")),
+    kb.add(InlineKeyboardButton("Студенты", callback_data=invite_cb.new("set_group")),
            InlineKeyboardButton("Преподаватель", callback_data=invite_cb.new("set_teacher")))
 
     if user.is_admin:
@@ -77,7 +77,7 @@ def make_invite_message(user, data=None):
     text = ["Тип: "]
     if "gri" in data:
         group = Group.get_by_id(data["gri"])
-        text += ["Студент\nГруппа: ", group.string_value]
+        text += ["Студенты\nГруппа: ", group.string_value]
 
     elif "tei" in data:
         teacher = Teacher.get_by_id(data["tei"])
@@ -133,7 +133,7 @@ async def cc_invite_set_group(call: aiogram.types.CallbackQuery):
 
 
 async def cc_invite_set_teacher(call: aiogram.types.CallbackQuery):
-    await call.message.answer("Отправьте Ваше ФИО")
+    await call.message.answer("Отправьте ФИО преподавтеля")
     await InviteStates.waiting_for_teacher.set()
     await call.answer()
 

@@ -8,15 +8,15 @@ from raspisanie_bot.database import User, Group, Cabinet, Teacher
 
 
 async def do_search_cabinet(message: aiogram.types.Message, user, cabinet):
-    await message.answer("В разработке (do_search_cabinet)")
+    await message.answer(f"В разработке (search; cabinet = {cabinet})")
 
 
 async def do_search_group(message: aiogram.types.Message, user, group):
-    await message.answer("В разработке (do_search_group)")
+    await message.answer(f"В разработке (search; group = {group.string_value})")
 
 
 async def do_search_teacher(message: aiogram.types.Message, user, teacher):
-    await message.answer("В разработке (do_search_teacher)")
+    await message.answer(f"В разработке (search; teacher = {teacher.full_name})")
 
 
 async def do_search(message: aiogram.types.Message, user, text):
