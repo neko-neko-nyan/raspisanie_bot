@@ -2,8 +2,8 @@ import aiogram
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
-from raspisanie_bot import parse_group_name
 from raspisanie_bot.bot_errors import bot_error
+from raspisanie_bot.bot_utils import get_group_or_none, get_teacher_or_none
 from raspisanie_bot.database import User, Group, Cabinet, Teacher
 
 
@@ -37,15 +37,12 @@ async def do_search(message: aiogram.types.Message, user, text):
             await do_search_cabinet(message, user, cabinet)
             return
 
-    group = parse_group_name(text, only_if_matches=True)
+    group = get_group_or_none(text)
     if group is not None:
-        group = Group.get_or_none(Group.course == group.course, Group.group == group.group,
-                                  Group.subgroup == group.subgroup)
-        if group is not None:
-            await do_search_group(message, user, group)
-            return
+        await do_search_group(message, user, group)
+        return
 
-    teacher = Teacher.get_or_none(Teacher.surname == text)
+    teacher = get_teacher_or_none(text)
     if teacher is not None:
         await do_search_teacher(message, user, teacher)
         return

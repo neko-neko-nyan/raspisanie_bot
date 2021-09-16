@@ -4,9 +4,8 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
-from raspisanie_bot import parse_group_name
-from raspisanie_bot.bot_errors import bot_error
-from raspisanie_bot.database import User, Group, Teacher
+from raspisanie_bot.bot_utils import get_group_or_bot_error
+from raspisanie_bot.database import User
 
 settings_cb = CallbackData("settings", "action")
 
@@ -53,15 +52,7 @@ async def cc_settings_set_group_teacher(call: aiogram.types.CallbackQuery, callb
 
 async def msg_settings_set_group(message: aiogram.types.Message, state: FSMContext):
     user = User.from_telegram(message.from_user)
-
-    group = parse_group_name(message.text, only_if_matches=True)
-    if group is None:
-        bot_error("INVALID_GROUP", user=user.tg_id, group=message.text)
-
-    group = Group.get_or_none(Group.course == group.course, Group.group == group.group,
-                              Group.subgroup == group.subgroup)
-    if group is None:
-        bot_error("INVALID_GROUP", user=user.tg_id, group=message.text)
+    group = get_group_or_bot_error(user, message.text)
 
     user.teacher = None
     user.group = group
@@ -72,11 +63,7 @@ async def msg_settings_set_group(message: aiogram.types.Message, state: FSMConte
 
 async def msg_settings_set_teacher(message: aiogram.types.Message, state: FSMContext):
     user = User.from_telegram(message.from_user)
-
-    teacher = Teacher.get_or_none(Teacher.surname == message.text)
-    # TODO: search teacher
-    if teacher is None:
-        bot_error("INVALID_TEACHER", user=user.tg_id, teacher=message.text)
+    teacher = get_group_or_bot_error(user, message.text)
 
     user.group = None
     user.teacher = teacher
@@ -85,7 +72,7 @@ async def msg_settings_set_teacher(message: aiogram.types.Message, state: FSMCon
     await state.finish()
 
 
-async def cc_settings_notifications(call: aiogram.types.CallbackQuery, callback_data):
+async def cc_settings_notifications(call: aiogram.types.CallbackQuery):
     await call.answer("В разработке (cc_settings_notifications)", show_alert=True)
 
 

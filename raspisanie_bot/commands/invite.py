@@ -10,6 +10,7 @@ from aiogram.utils.callback_data import CallbackData
 
 from raspisanie_bot import config, parse_group_name
 from raspisanie_bot.bot_errors import bot_error
+from raspisanie_bot.bot_utils import get_group_or_bot_error, get_teacher_or_bot_error
 from raspisanie_bot.database import Teacher, Invite, Group, User
 
 
@@ -23,23 +24,11 @@ def create_invite(user, group_name=None, teacher_name=None, is_admin=False):
         invite_data["isa"] = True
 
     if group_name:
-        group = parse_group_name(group_name, only_if_matches=True)
-        if group is None:
-            bot_error("INVALID_GROUP", group=group_name)
-
-        group = Group.get_or_none(Group.course == group.course, Group.group == group.group,
-                                  Group.subgroup == group.subgroup)
-        if group is None:
-            bot_error("INVALID_GROUP", group=group_name)
-
+        group = get_group_or_bot_error(user, group_name)
         invite_data["gri"] = group.id
 
     if teacher_name:
-        # TODO: search teacher
-        teacher = Teacher.get_or_none(teacher_name)
-        if teacher is None:
-            bot_error("INVALID_TEACHER", teacher=teacher_name)
-
+        teacher = get_teacher_or_bot_error(user, teacher_name)
         invite_data["tei"] = teacher.id
 
     invite_data["iid"] = Invite.create(created_by=user).id
