@@ -141,7 +141,7 @@ class StorageState(BaseModel):
 class StorageData(BaseModel):
     id = CharField(64)
     key = CharField(64)
-    state = BareField()
+    value = BareField()
 
     class Meta:
         primary_key = CompositeKey('id', 'key')

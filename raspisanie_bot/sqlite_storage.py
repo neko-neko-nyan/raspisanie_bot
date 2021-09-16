@@ -17,7 +17,7 @@ class SQLiteStorage(BaseStorage):
 
         chat, user = self.check_address(chat=chat, user=user)
         ss = StorageState.get_or_create(id=f"{chat}:{user}")[0]
-        ss.state = state
+        ss.state = self.resolve_state(state)
         ss.save()
 
     async def reset_state(self, *, chat=None, user=None, with_data=True):
@@ -32,7 +32,7 @@ class SQLiteStorage(BaseStorage):
 
         data = {}
         with db.atomic():
-            for sd in StorageData.select().where(id=f"{chat}:{user}"):
+            for sd in StorageData.select().where(StorageData.id == f"{chat}:{user}"):
                 data[sd.key] = sd.value
 
         return data
@@ -48,7 +48,7 @@ class SQLiteStorage(BaseStorage):
             StorageData.delete().where(StorageData.id == did).execute()
 
             for key, value in data.items():
-                sd = StorageData.get_or_create(id=did, key=key)[0]
+                sd = StorageData.get_or_create(id=did, key=key, defaults=dict(value=value))[0]
                 sd.value = value
                 sd.save()
 
@@ -63,7 +63,7 @@ class SQLiteStorage(BaseStorage):
 
         with db.atomic():
             for key, value in data.items():
-                sd = StorageData.get_or_create(id=did, key=key)[0]
+                sd = StorageData.get_or_create(id=did, key=key, defaults=dict(value=value))[0]
                 sd.value = value
                 sd.save()
 
