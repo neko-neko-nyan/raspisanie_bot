@@ -36,7 +36,7 @@ class Teacher(BaseModel):
 
 class Group(BaseModel):
     id = AutoField()
-    owner = ForeignKeyField(Teacher)
+    owner = ForeignKeyField(Teacher, null=True)
 
     course = IntegerField()
     group = CharField(max_length=8)
@@ -51,28 +51,33 @@ class Group(BaseModel):
 
 
 class Cabinet(BaseModel):
-    id = AutoField()
-    owner = ForeignKeyField(Teacher)
-
-    number = IntegerField()
+    number = IntegerField(primary_key=True)
+    owner = ForeignKeyField(Teacher, null=True)
     floor = IntegerField()
+    name = CharField(64)
 
 
 class PairTime(BaseModel):
-    pair_number = IntegerField()
-    date = DateField()
-
+    pair_number = IntegerField(primary_key=True)
     start_time = IntegerField()
     end_time = IntegerField()
 
 
 class Pair(BaseModel):
-    time = ForeignKeyField(PairTime)
+    id = AutoField()
+
+    date = DateField()
+    pair_number = IntegerField()
     group = ForeignKeyField(Group)
 
     name = CharField(max_length=128)
-    teachers = ManyToManyField(Teacher)
-    cabinets = ManyToManyField(Cabinet)
+    teachers = ManyToManyField(Teacher, on_delete='CASCADE')
+    cabinets = ManyToManyField(Cabinet, on_delete='CASCADE')
+
+    class Meta:
+        indexes = (
+            (('date', 'pair_number', 'group'), True),
+        )
 
 
 class User(BaseModel):
