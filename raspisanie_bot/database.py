@@ -2,9 +2,14 @@ import datetime
 import pathlib
 
 from peewee import *
+from playhouse.sqlite_ext import SqliteExtDatabase
 
-
-db = SqliteDatabase(pathlib.Path(__file__).parent.parent / "database.sqlite")
+db = SqliteExtDatabase(pathlib.Path(__file__).parent.parent / "database.sqlite", pragmas=(
+    ('cache_size', -1024 * 64),  # 64MB page-cache.
+    ('encoding', '\'UTF-8\''),
+    ('foreign_keys', 1),  # Enforce foreign-key constraints.
+    ('journal_mode', 'wal'),  # Use WAL-mode (you should always use this!).
+))
 
 
 class BaseModel(Model):
