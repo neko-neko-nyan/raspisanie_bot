@@ -12,3 +12,5 @@ if not BOT_TOKEN:
 
 
 ENABLE_DEBUG_DATA = True
+UPDATE_INTERVAL = 15 * 60
+TIMETABLE_URL = "http://novkrp.ru/raspisanie.htm"

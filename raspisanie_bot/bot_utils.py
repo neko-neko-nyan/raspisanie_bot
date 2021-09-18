@@ -11,7 +11,7 @@ def group_from_parsed(group):
 
 
 def get_group_or_none(text):
-    group = parse_group_name(text, only_if_matches=True)
+    group = parse_group_name(text)
     if group is not None:
         group = group_from_parsed(group)
 
