@@ -1,14 +1,13 @@
 import io
 
 import aiogram
-import jwt
 import qrcode
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 from aiogram.utils.callback_data import CallbackData
 
-from raspisanie_bot import config
+from raspisanie_bot import config, encoded_invite
 from raspisanie_bot.bot_errors import bot_error
 from raspisanie_bot.bot_utils import get_group_or_bot_error, get_teacher_or_bot_error
 from raspisanie_bot.database import Invite, User, Group, Teacher
@@ -18,30 +17,21 @@ def create_invite(user, data=None, user_data=None):
     data = data or {}
     user_data = user_data or {}
 
-    invite_data = {}
+    gri = data.get("gri")
+    tei = data.get("tei")
 
-    if user_data.get("admin", "false").lower() != "false" or data.get("isa"):
-        if not user.is_admin:
-            bot_error("NOT_ADMIN", user=user.tg_id)
-
-        invite_data["isa"] = True
+    isa = user_data.get("admin", "false").lower() != "false" or data.get("isa")
+    if isa and not user.is_admin:
+        bot_error("NOT_ADMIN", user=user.tg_id)
 
     if "group" in user_data:
-        group = get_group_or_bot_error(user, user_data["group"])
-        invite_data["gri"] = group.id
-
-    if "gri" in data:
-        invite_data["gri"] = data["gri"]
+        gri = get_group_or_bot_error(user, user_data["group"]).id
 
     if "teacher" in user_data:
-        teacher = get_teacher_or_bot_error(user, user_data["teacher"])
-        invite_data["tei"] = teacher.id
+        tei = get_teacher_or_bot_error(user, user_data["teacher"]).id
 
-    if "tei" in data:
-        invite_data["tei"] = data["tei"]
-
-    invite_data["iid"] = Invite.create(created_by=user).id
-    code = jwt.encode(invite_data, config.JWT_KEY)
+    iid = Invite.create(created_by=user).id
+    code = encoded_invite.encode_invite(config.JWT_KEY, iid, gri, tei, isa)
     link = f"https://t.me/nkrp_bot?start={code}"
 
     img = qrcode.make(link)

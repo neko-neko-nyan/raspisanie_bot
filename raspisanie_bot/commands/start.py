@@ -1,8 +1,7 @@
 import aiogram
-import jwt
 from aiogram.dispatcher import FSMContext
 
-from raspisanie_bot import config
+from raspisanie_bot import config, encoded_invite
 from raspisanie_bot.bot_errors import bot_error
 from raspisanie_bot.database import Teacher, Invite, Group, User
 
@@ -16,14 +15,11 @@ async def cmd_start(message: aiogram.types.Message, state: FSMContext):
 
     args = message.get_args()
     if args:
-        invite_data = jwt.decode(args, config.JWT_KEY, algorithms=["HS256"])
-        if "iid" not in invite_data:
-            bot_error("JWT_ERROR")
-
-        invite = Invite.get_or_none(Invite.id == invite_data["iid"], Invite.is_used == False)
+        iid, gri, tei, isa = encoded_invite.decode_invite(config.JWT_KEY, args)
+        invite = Invite.get_or_none(Invite.id == iid, Invite.is_used == False)
 
         if invite is None:
-            bot_error("INVITE_USED", invite=invite_data["iid"], user=user.tg_id)
+            bot_error("INVITE_USED", invite=iid, user=user.tg_id)
 
         if user.invite is not None:
             if user.invite != invite.id:
@@ -36,7 +32,7 @@ async def cmd_start(message: aiogram.types.Message, state: FSMContext):
             user.invite = invite
             invite.is_used = True
 
-            if "isa" in invite_data:
+            if isa:
                 # Если у пользователя забрали права администратора, то все его приглашения, дававшие права
                 # администратора перестанут работать.
                 if not User.get_by_id(invite.created_by).is_admin:
@@ -44,11 +40,11 @@ async def cmd_start(message: aiogram.types.Message, state: FSMContext):
 
                 user.is_admin = True
 
-            if "gri" in invite_data:
-                user.group = Group.get_or_none(Group.id == invite_data["gri"])
+            if gri is not None:
+                user.group = Group.get_or_none(Group.id == gri)
 
-            elif "tei" in invite_data:
-                user.teacher = Teacher.get_or_none(Teacher.id == invite_data["tei"])
+            elif tei is not None:
+                user.teacher = Teacher.get_or_none(Teacher.id == tei)
 
             invite.save()
             user.save()
