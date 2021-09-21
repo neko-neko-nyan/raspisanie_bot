@@ -15,5 +15,6 @@ async def cmd_my(message: aiogram.types.Message, state: FSMContext):
     await state.reset_state()
 
 
-def install_my(dp):
+def install_my(dp, all_commands):
     dp.register_message_handler(cmd_my, commands="my", state='*')
+    all_commands.append(aiogram.types.BotCommand("/my", "Мое расписание"))

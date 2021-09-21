@@ -66,10 +66,15 @@ async def cmd_cancel(message: aiogram.types.Message, state: FSMContext):
     await state.reset_state()
 
 
-def install_start(dp):
-    # Должен быть всегда первым для работы команды /cancel
-    dp.register_message_handler(cmd_cancel, commands="cancel", state='*')
+def install_cancel(dp):
     dp.register_message_handler(cmd_cancel, lambda msg: msg.text.lower().strip() == 'отмена', state='*')
 
+
+def install_start(dp, all_commands):
+    dp.register_message_handler(cmd_cancel, commands="cancel", state='*')
+    all_commands.append(aiogram.types.BotCommand("/cancel", "Отмена действия"))
+
     dp.register_message_handler(cmd_start, commands="start", state='*')
+
     dp.register_message_handler(cmd_help, commands="help", state='*')
+    all_commands.append(aiogram.types.BotCommand("/help", "Справка"))

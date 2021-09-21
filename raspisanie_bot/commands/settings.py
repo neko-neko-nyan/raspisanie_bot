@@ -76,8 +76,10 @@ async def cc_settings_notifications(call: aiogram.types.CallbackQuery):
     await call.answer("В разработке (notifications)", show_alert=True)
 
 
-def install_settings(dp):
+def install_settings(dp, all_commands):
     dp.register_message_handler(cmd_settings, commands="settings", state='*')
+    all_commands.append(aiogram.types.BotCommand("/settings", "Настройки"))
+
     dp.register_callback_query_handler(cc_settings_set_group_teacher,
                                        settings_cb.filter(action=["set_group", "set_teacher"]))
     dp.register_message_handler(msg_settings_set_group, state=SettingsStates.waiting_for_group)

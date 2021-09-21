@@ -187,8 +187,10 @@ async def cc_invite_create(call: aiogram.types.CallbackQuery, state: FSMContext)
     await state.finish()
 
 
-def install_invite(dp):
+def install_invite(dp, all_commands):
     dp.register_message_handler(cmd_invite, commands="invite", state='*')
+    all_commands.append(aiogram.types.BotCommand("/invite", "Создать ссылку-приглашение"))
+
     dp.register_callback_query_handler(cc_invite_set_admin, invite_cb.filter(action="set_admin"),
                                        state=InviteStates.waiting_for_user_action)
     dp.register_callback_query_handler(cc_invite_set_group, invite_cb.filter(action="set_group"),

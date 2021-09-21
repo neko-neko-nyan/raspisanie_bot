@@ -36,9 +36,3 @@ def decode_invite(key, data: str):
             tei = eid
 
     return iid, gri, tei, isa
-
-
-if __name__ == '__main__':
-    encoded = encode_invite(b"TEST KEY", 12345, 9999, 6666, True)
-    print(encoded)
-    print(decode_invite(b"TEST KEY", encoded))

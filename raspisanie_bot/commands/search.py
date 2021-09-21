@@ -132,7 +132,11 @@ async def cmd_search_me(message: aiogram.types.Message, state: FSMContext):
     await state.reset_state()
 
 
-def install_search(dp):
+def install_search(dp, all_commands):
     dp.register_message_handler(cmd_search, commands="search", state='*')
+    all_commands.append(aiogram.types.BotCommand("/search", "Найти группу, преподавателя или кабинет"))
+
     dp.register_message_handler(cmd_search_me, commands="search_me", state='*')
+    all_commands.append(aiogram.types.BotCommand("/search_me", "Найти себя"))
+
     dp.register_message_handler(msg_search_text, state=SearchStates.waiting_for_text)
