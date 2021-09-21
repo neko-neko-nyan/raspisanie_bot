@@ -62,6 +62,25 @@ class PairTime(BaseModel):
     start_time = IntegerField()
     end_time = IntegerField()
 
+    @classmethod
+    def current(cls):
+        return cls.get_pair(datetime.datetime.now())
+
+    @classmethod
+    def by_time(cls, curr_time):
+        # in_pair, non_prev_pair
+        curr_time = curr_time.hour * 60 + curr_time.minute
+
+        try:
+            pt = cls.select() \
+                .where(curr_time < cls.end_time) \
+                .order_by(cls.pair_number) \
+                .get()
+        except cls.DoesNotExist:
+            return False, None
+
+        return curr_time >= pt.start_time, pt
+
 
 class Pair(BaseModel):
     id = AutoField()
