@@ -27,11 +27,11 @@ class Teacher(BaseModel):
 
     @property
     def full_name(self):
-        return f"{self.surname} {self.name} {self.patronymic}".capitalize()
+        return f"{self.surname} {self.name} {self.patronymic}"
 
     @property
     def short_name(self):
-        return f"{self.surname} {self.name[0]}. {self.patronymic[0]}.".capitalize()
+        return f"{self.surname} {self.name[0]}. {self.patronymic[0]}."
 
 
 class Group(BaseModel):
