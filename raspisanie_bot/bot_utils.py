@@ -1,3 +1,5 @@
+import re
+
 import peewee
 
 from raspisanie_bot import parse_group_name
@@ -39,10 +41,22 @@ def teacher_from_parsed(teacher):
         pass
 
 
+NOT_WORD_RE = re.compile('\\W+')
+
+
 def get_teacher_or_none(text):
-    # TODO: search teacher
-    teacher = Teacher.get_or_none(Teacher.surname == text)
-    return teacher
+    text = NOT_WORD_RE.sub(' ', text).strip().split()
+
+    s = Teacher.select()
+
+    for i in text:
+        j = i.capitalize()
+        s = s.orwhere(Teacher.surname.contains(i), Teacher.surname.startswith(j))
+
+    try:
+        return s.get()
+    except peewee.DoesNotExist:
+        return None
 
 
 def get_teacher_or_bot_error(user, text):
