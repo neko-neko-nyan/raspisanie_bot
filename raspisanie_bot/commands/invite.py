@@ -7,10 +7,11 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 from aiogram.utils.callback_data import CallbackData
 
-from raspisanie_bot import config, encoded_invite
-from raspisanie_bot.bot_errors import bot_error
-from raspisanie_bot.bot_utils import get_group_or_bot_error, get_teacher_or_bot_error
-from raspisanie_bot.database import Invite, User, Group, Teacher
+from ..bot_errors import bot_error
+from ..bot_utils import get_group_or_bot_error, get_teacher_or_bot_error
+from ..config import INVITE_SIGN_KEY
+from ..database import Invite, User, Group, Teacher
+from ..encoded_invite import encode_invite
 
 
 def create_invite(user, data=None, user_data=None):
@@ -28,7 +29,7 @@ def create_invite(user, data=None, user_data=None):
         data["tei"] = get_teacher_or_bot_error(user, user_data["teacher"]).id
 
     invite = Invite.create(author=user, set_group=data.get("gri"), set_teacher=data.get("tei"), set_admin=set_admin)
-    code = encoded_invite.encode_invite(config.JWT_KEY, invite.id)
+    code = encode_invite(INVITE_SIGN_KEY, invite.id)
     link = f"https://t.me/nkrp_bot?start={code}"
 
     img = qrcode.make(link)

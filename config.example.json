@@ -1,0 +1,25 @@
+{
+  "JWT_KEY_FOR_ERRORS": "<RANDOM TEXT HERE>",
+  "INVITE_SIGN_KEY": "<ANOTHER RANDOM TEXT HERE>",
+  "BOT_TOKEN": "<BOT TOKEN HERE>",
+
+  "UPDATE_INTERVAL": 3600,
+  "TIMETABLE_URL": "http://novkrp.ru/raspisanie.htm",
+
+  "enable_features": {
+    "admin": false,
+    "report": false,
+    "settings_notifications": false,
+
+    "debug_info": true,
+
+    "remove_old_data": false,
+    "preload_persist": true,
+    "always_preload_persist": false,
+    "create_missing_persist": true,
+
+    "notifications": false,
+    "cvp_parse": true,
+    "cvp_data": true
+  }
+}

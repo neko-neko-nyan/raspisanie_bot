@@ -2,9 +2,9 @@ import re
 
 import peewee
 
-from raspisanie_bot import parse_group_name
-from raspisanie_bot.bot_errors import bot_error
-from raspisanie_bot.database import Group, Teacher
+from .bot_errors import bot_error
+from .database import Group, Teacher
+from .parsing import parse_group_name
 
 
 def group_from_parsed(group):

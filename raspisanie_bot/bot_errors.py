@@ -2,7 +2,7 @@ import aiogram
 import jwt
 from aiogram.utils.markdown import escape_md
 
-from . import config
+from .config import feature_enabled, JWT_KEY_FOR_ERRORS
 from .encoded_invite import InviteSignatureError
 
 ERRORS = {
@@ -40,7 +40,7 @@ def format_error(name, exception: BaseException = None, **data):
         error = ERRORS["UNKNOWN_ERROR"]
         data["error_name"] = name
 
-    if not config.ENABLE_DEBUG_DATA:
+    if not feature_enabled("debug_info"):
         return escape_md(error[1])
 
     if exception is not None:
@@ -48,7 +48,7 @@ def format_error(name, exception: BaseException = None, **data):
         data["exc_args"] = list(exception.args)
 
     data["error_code"] = error[0]
-    data = jwt.encode(data, config.JWT_KEY)
+    data = jwt.encode(data, JWT_KEY_FOR_ERRORS)
     return f"{escape_md(error[1])}\n```\nКод ошибки: {error[0]}\nДанные для разработчиков: {escape_md(data)}\n```\n"
 
 

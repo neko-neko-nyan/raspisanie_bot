@@ -2,7 +2,8 @@ import asyncio
 import logging
 
 from async_utils import CancelableTimer
-from . import TimetableUpdater, DatabaseFinder, UniversalHandler
+from .database import DatabaseFinder, UniversalHandler
+from .parsers import TimetableUpdater
 from .. import config
 
 

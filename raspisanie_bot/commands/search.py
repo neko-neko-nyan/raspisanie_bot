@@ -3,9 +3,9 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.utils.markdown import escape_md
 
-from raspisanie_bot.bot_errors import bot_error
-from raspisanie_bot.bot_utils import get_group_or_none, get_teacher_or_none
-from raspisanie_bot.database import User, Group, Cabinet, Teacher, Pair
+from ..bot_errors import bot_error
+from ..bot_utils import get_group_or_none, get_teacher_or_none
+from ..database import User, Group, Cabinet, Teacher, Pair
 
 
 MONTH_NAMES = [

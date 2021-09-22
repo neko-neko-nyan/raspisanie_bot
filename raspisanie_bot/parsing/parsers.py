@@ -16,6 +16,8 @@ import pdfminer.pdfinterp
 import pdfminer.pdfpage
 from lxml import html
 
+from ..config import feature_enabled
+
 GroupName = collections.namedtuple('GroupName', ('course', 'group', 'subgroup'))
 
 
@@ -438,7 +440,8 @@ class SubpagesParsingHandler(Handler):
     __slots__ = ()
 
     def handle_cvp(self, link):
-        self.parser.then(self.parser.update_cvp(link))
+        if feature_enabled("cvp_parse"):
+            self.parser.then(self.parser.update_cvp(link))
 
     def handle_call_schedule(self, link):
         self.parser.then(self.parser.update_call_schedule(link))

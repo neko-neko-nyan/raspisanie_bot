@@ -1,6 +1,6 @@
 from aiogram.dispatcher.storage import BaseStorage
 
-from raspisanie_bot.database import StorageState, StorageData, db
+from .database import StorageState, StorageData, db
 
 
 class SQLiteStorage(BaseStorage):

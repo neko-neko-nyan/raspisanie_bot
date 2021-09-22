@@ -1,8 +1,8 @@
 import aiogram
 from aiogram.dispatcher import FSMContext
 
-from raspisanie_bot.bot_errors import bot_error
-from raspisanie_bot.database import User
+from ..bot_errors import bot_error
+from ..database import User
 
 
 async def cmd_my(message: aiogram.types.Message, state: FSMContext):

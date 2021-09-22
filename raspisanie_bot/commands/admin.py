@@ -1,8 +1,9 @@
 import aiogram
 from aiogram.dispatcher import FSMContext
 
-from raspisanie_bot.bot_errors import bot_error
-from raspisanie_bot.database import User
+from ..bot_errors import bot_error
+from ..config import feature_enabled
+from ..database import User
 
 
 async def cmd_admin(message: aiogram.types.Message, state: FSMContext):
@@ -16,4 +17,5 @@ async def cmd_admin(message: aiogram.types.Message, state: FSMContext):
 
 
 def install_admin(dp):
-    dp.register_message_handler(cmd_admin, commands="admin", state='*')
+    if feature_enabled("admin"):
+        dp.register_message_handler(cmd_admin, commands="admin", state='*')

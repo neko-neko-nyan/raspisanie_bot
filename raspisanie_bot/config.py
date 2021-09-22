@@ -1,16 +1,21 @@
-import os
-import random
+import json
+import pathlib
 
-JWT_KEY = os.getenvb(b"JWT_KEY")
-if not JWT_KEY:
-    JWT_KEY = random.randbytes(64)
+BOT_DIR = pathlib.Path(__file__).parent.parent
+
+config = json.loads((BOT_DIR / "config.json").read_text())
+_features = None
+
+INVITE_SIGN_KEY = config.get("INVITE_SIGN_KEY", "").encode()
+JWT_KEY_FOR_ERRORS = config.get("JWT_KEY_FOR_ERRORS", "").encode()
+BOT_TOKEN = config.get("BOT_TOKEN")
+UPDATE_INTERVAL = config.get("UPDATE_INTERVAL", 3600)
+TIMETABLE_URL = config.get("TIMETABLE_URL", "")
 
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-if not BOT_TOKEN:
-    exit("Error: no token provided")
+def feature_enabled(name):
+    global _features
+    if _features is None:
+        _features = config.get("enable_features", {})
 
-
-ENABLE_DEBUG_DATA = True
-UPDATE_INTERVAL = 15 * 60
-TIMETABLE_URL = "http://novkrp.ru/raspisanie.htm"
+    return bool(_features.get(name, False))

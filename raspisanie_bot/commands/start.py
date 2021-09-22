@@ -1,9 +1,10 @@
 import aiogram
 from aiogram.dispatcher import FSMContext
 
-from raspisanie_bot import config, encoded_invite
-from raspisanie_bot.bot_errors import bot_error
-from raspisanie_bot.database import Invite, User
+from ..bot_errors import bot_error
+from ..config import INVITE_SIGN_KEY
+from ..database import Invite, User
+from ..encoded_invite import decode_invite
 
 
 async def send_help(message: aiogram.types.Message, user: User):
@@ -15,7 +16,7 @@ async def cmd_start(message: aiogram.types.Message, state: FSMContext):
 
     args = message.get_args()
     if args:
-        iid = encoded_invite.decode_invite(config.JWT_KEY, args)
+        iid = decode_invite(INVITE_SIGN_KEY, args)
         invite = Invite.get_or_none(Invite.id == iid)
 
         if invite is None:
