@@ -20,7 +20,7 @@ def create_invite(user, data=None, user_data=None):
 
     set_admin = user_data.get("admin", "false").lower() != "false" or data.get("isa", False)
     if set_admin and not user.is_admin:
-        bot_error("NOT_ADMIN", user=user.tg_id)
+        bot_error("NOT_ADMIN", user=user)
 
     if "group" in user_data:
         data["gri"] = get_group_or_bot_error(user, user_data["group"]).id
@@ -107,7 +107,7 @@ async def cc_invite_set_admin(call: aiogram.types.CallbackQuery, state: FSMConte
     user = User.from_telegram(call.from_user)
 
     if not user.is_admin:
-        bot_error("NOT_ADMIN", user=user.tg_id)
+        bot_error("NOT_ADMIN", user=user)
 
     async with state.proxy() as st:
         st["isa"] = not st.get("isa", False)

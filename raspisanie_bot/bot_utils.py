@@ -23,7 +23,7 @@ def get_group_or_none(text):
 def get_group_or_bot_error(user, text):
     group = get_group_or_none(text)
     if group is None:
-        bot_error("INVALID_GROUP", user=user.tg_id, group=text)
+        bot_error("INVALID_GROUP", user=user, group=text)
 
     return group
 
@@ -62,6 +62,6 @@ def get_teacher_or_none(text):
 def get_teacher_or_bot_error(user, text):
     teacher = get_teacher_or_none(text)
     if teacher is None:
-        bot_error("INVALID_TEACHER", user=user.tg_id, teacher=text)
+        bot_error("INVALID_TEACHER", user=user, teacher=text)
 
     return teacher

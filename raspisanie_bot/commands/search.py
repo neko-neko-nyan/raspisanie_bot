@@ -92,7 +92,7 @@ async def do_search(message: aiogram.types.Message, user, text):
         await do_search_query(message, user, 'teacher', teacher)
         return
 
-    bot_error("NOT_FOUND", user=user.tg_id, text=text)
+    bot_error("NOT_FOUND", user=user, text=text)
 
 
 class SearchStates(StatesGroup):
@@ -127,7 +127,7 @@ async def cmd_search_me(message: aiogram.types.Message, state: FSMContext):
         await do_search_query(message, user, 'teacher', Teacher.get_by_id(user.teacher))
 
     else:
-        bot_error("NOT_CONFIGURED", user=user.tg_id)
+        bot_error("NOT_CONFIGURED", user=user)
 
     await state.reset_state()
 

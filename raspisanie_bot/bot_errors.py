@@ -35,6 +35,7 @@ def bot_error(name, exception: BaseException = None, **data):
 
 
 def format_error(name, exception: BaseException = None, **data):
+    data = {k: getattr(v, 'rowid', v) for k, v in data.items()}
     error = ERRORS.get(name)
     if error is None:
         error = ERRORS["UNKNOWN_ERROR"]
