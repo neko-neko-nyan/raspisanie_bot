@@ -29,18 +29,18 @@ async def do_search_query(message: aiogram.types.Message, user, search_type, tar
     prev_date = None
 
     if search_type == 'group':
-        query = Pair.group == target.id
+        query = Pair.group == target
         allow_hide = True
 
     elif search_type == 'cabinet':
-        query = Pair.id.in_(Pair.cabinets.through_model.select(Pair.cabinets.through_model.pair_id)
-                            .where(Pair.cabinets.through_model.cabinet_id == target.number))
+        query = Pair.rowid.in_(Pair.cabinets.through_model.select(Pair.cabinets.through_model.pair_id)
+                               .where(Pair.cabinets.through_model.cabinet_id == target.rowid))
         allow_hide = is_allow_hide_pair_comp(Pair.cabinets.through_model, Pair.cabinets.through_model.cabinet_id, query)
 
     else:
         assert search_type == 'teacher'
-        query = Pair.id.in_(Pair.teachers.through_model.select(Pair.teachers.through_model.pair_id)
-                            .where(Pair.teachers.through_model.teacher_id == target.id))
+        query = Pair.rowid.in_(Pair.teachers.through_model.select(Pair.teachers.through_model.pair_id)
+                               .where(Pair.teachers.through_model.teacher_id == target.rowid))
         allow_hide = is_allow_hide_pair_comp(Pair.teachers.through_model, Pair.teachers.through_model.teacher_id, query)
 
     for pair in Pair.select(Pair, Group).join(Group).where(query).order_by(Pair.date, Pair.pair_number):
@@ -77,7 +77,7 @@ async def do_search(message: aiogram.types.Message, user, text):
         pass
 
     else:
-        cabinet = Cabinet.get_or_none(Cabinet.number == cabinet)
+        cabinet = Cabinet.get_or_none(Cabinet.rowid == cabinet)
         if cabinet is not None:
             await do_search_query(message, user, 'cabinet', cabinet)
             return

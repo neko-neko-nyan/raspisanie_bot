@@ -2,7 +2,7 @@ import datetime
 import pathlib
 
 from peewee import *
-from playhouse.sqlite_ext import SqliteExtDatabase
+from playhouse.sqlite_ext import SqliteExtDatabase, RowIDField
 
 db = SqliteExtDatabase(pathlib.Path(__file__).parent.parent / "database.sqlite", pragmas=(
     ('cache_size', -1024 * 64),  # 64MB page-cache.
@@ -31,7 +31,7 @@ class PairNameFix(BaseModel):
 
 
 class Teacher(BaseModel):
-    id = AutoField()
+    rowid = RowIDField()
 
     surname = CharField(max_length=64)
     name = CharField(max_length=64)
@@ -47,7 +47,8 @@ class Teacher(BaseModel):
 
 
 class Group(BaseModel):
-    id = AutoField()
+    rowid = RowIDField()
+
     owner = ForeignKeyField(Teacher, null=True)
 
     course = IntegerField()
@@ -63,10 +64,15 @@ class Group(BaseModel):
 
 
 class Cabinet(BaseModel):
-    number = IntegerField(primary_key=True)
+    rowid = RowIDField()
+
     owner = ForeignKeyField(Teacher, null=True)
     floor = IntegerField()
     name = CharField(64)
+
+    @property
+    def number(self):
+        return self.rowid
 
 
 # #################################################################################################################### #
@@ -77,7 +83,7 @@ class Cabinet(BaseModel):
 
 
 class Pair(BaseModel):
-    id = AutoField()
+    rowid = RowIDField()
 
     date = DateField()
     pair_number = IntegerField()
@@ -133,7 +139,7 @@ class PairTime(BaseModel):
 
 
 class User(BaseModel):
-    tg_id = IntegerField(primary_key=True)
+    rowid = RowIDField()
 
     invite = DeferredForeignKey('Invite', null=True)
 
@@ -166,20 +172,21 @@ class User(BaseModel):
 
     @classmethod
     def from_telegram(cls, telegram_user):
-        user = User.get_or_none(User.tg_id == telegram_user.id)
+        user = User.get_or_none(User.rowid == telegram_user.id)
         if user is not None:
             user.last_activity = datetime.datetime.now()
             user.save()
             return user
 
-        return User.create(tg_id=telegram_user.id)
+        return User.create(rowid=telegram_user.id)
 
     def is_configured(self):
         return self.group is not None or self.teacher is not None
 
 
 class Invite(BaseModel):
-    id = IntegerField(primary_key=True)
+    rowid = RowIDField()
+
     author = ForeignKeyField(User)
     set_group = ForeignKeyField(Group, null=True)
     set_teacher = ForeignKeyField(Teacher, null=True)

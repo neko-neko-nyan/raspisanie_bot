@@ -17,13 +17,13 @@ async def cmd_start(message: aiogram.types.Message, state: FSMContext):
     args = message.get_args()
     if args:
         iid = decode_invite(INVITE_SIGN_KEY, args)
-        invite = Invite.get_or_none(Invite.id == iid)
+        invite = Invite.get_or_none(Invite.rowid == iid)
 
         if invite is None:
             bot_error("INVITE_NOT_EXIST", invite=iid, user=user)
 
         if user.invite is not None:
-            if user.invite.id != invite.id:
+            if user.invite.rowid != invite.rowid:
                 bot_error("INVITE_ANOTHER_USED", invite=invite, user=user)
 
             await message.reply("Вы уже использовали этот код, повторное использование ничего не меняет :(")

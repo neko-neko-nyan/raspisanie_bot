@@ -23,13 +23,13 @@ def create_invite(user, data=None, user_data=None):
         bot_error("NOT_ADMIN", user=user)
 
     if "group" in user_data:
-        data["gri"] = get_group_or_bot_error(user, user_data["group"]).id
+        data["gri"] = get_group_or_bot_error(user, user_data["group"]).rowid
 
     if "teacher" in user_data:
-        data["tei"] = get_teacher_or_bot_error(user, user_data["teacher"]).id
+        data["tei"] = get_teacher_or_bot_error(user, user_data["teacher"]).rowid
 
     invite = Invite.create(author=user, set_group=data.get("gri"), set_teacher=data.get("tei"), set_admin=set_admin)
-    code = encode_invite(INVITE_SIGN_KEY, invite.id)
+    code = encode_invite(INVITE_SIGN_KEY, invite.rowid)
     link = f"https://t.me/nkrp_bot?start={code}"
 
     img = qrcode.make(link)
@@ -145,7 +145,7 @@ async def msg_invite_set_group(message: aiogram.types.Message, state: FSMContext
         if "tei" in st:
             del st["tei"]
 
-        st["gri"] = group.id
+        st["gri"] = group.rowid
         st.state = InviteStates.waiting_for_user_action
 
         data = dict(st)
@@ -162,7 +162,7 @@ async def msg_invite_set_teacher(message: aiogram.types.Message, state: FSMConte
         if "gri" in st:
             del st["gri"]
 
-        st["tei"] = teacher.id
+        st["tei"] = teacher.rowid
         st.state = InviteStates.waiting_for_user_action
 
         data = dict(st)
