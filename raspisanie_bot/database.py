@@ -18,6 +18,18 @@ class BaseModel(Model):
         legacy_table_names = False
 
 
+# #################################################################################################################### #
+#                                                                                                                      #
+#                               Базовые неизменяемые компоненты: teacher, group, cabinet                               #
+#                                                                                                                      #
+# #################################################################################################################### #
+
+
+class PairNameFix(BaseModel):
+    prev_name = CharField(64, primary_key=True)
+    new_name = CharField(64)
+
+
 class Teacher(BaseModel):
     id = AutoField()
 
@@ -57,6 +69,30 @@ class Cabinet(BaseModel):
     name = CharField(64)
 
 
+# #################################################################################################################### #
+#                                                                                                                      #
+#                             Базовые изменяемые компоненты через парсинг: pair, pair_time                             #
+#                                                                                                                      #
+# #################################################################################################################### #
+
+
+class Pair(BaseModel):
+    id = AutoField()
+
+    date = DateField()
+    pair_number = IntegerField()
+    group = ForeignKeyField(Group)
+
+    name = CharField(max_length=128)
+    teachers = ManyToManyField(Teacher, on_delete='CASCADE')
+    cabinets = ManyToManyField(Cabinet, on_delete='CASCADE')
+
+    class Meta:
+        indexes = (
+            (('date', 'pair_number', 'group'), True),
+        )
+
+
 class PairTime(BaseModel):
     pair_number = IntegerField(primary_key=True)
     start_time = IntegerField()
@@ -82,28 +118,24 @@ class PairTime(BaseModel):
         return curr_time >= pt.start_time, pt
 
 
-class Pair(BaseModel):
-    id = AutoField()
+# #################################################################################################################### #
+#                                                                                                                      #
+#                                         Расписание столовой (covid_pit.pdt)                                          #
+#                                                                                                                      #
+# #################################################################################################################### #
 
-    date = DateField()
-    pair_number = IntegerField()
-    group = ForeignKeyField(Group)
 
-    name = CharField(max_length=128)
-    teachers = ManyToManyField(Teacher, on_delete='CASCADE')
-    cabinets = ManyToManyField(Cabinet, on_delete='CASCADE')
-
-    class Meta:
-        indexes = (
-            (('date', 'pair_number', 'group'), True),
-        )
+# #################################################################################################################### #
+#                                                                                                                      #
+#                                     Взаимодействие с пользователем: user, invite                                     #
+#                                                                                                                      #
+# #################################################################################################################### #
 
 
 class User(BaseModel):
     tg_id = IntegerField(primary_key=True)
 
-    invited_by = ForeignKeyField('self', null=True)
-    invite = IntegerField(null=True)
+    invite = DeferredForeignKey('Invite', null=True)
 
     is_admin = BooleanField(default=False)
 
@@ -148,18 +180,21 @@ class User(BaseModel):
 
 class Invite(BaseModel):
     id = IntegerField(primary_key=True)
-    created_by = ForeignKeyField(User)
-    is_used = BooleanField(default=False)
+    author = ForeignKeyField(User)
+    set_group = ForeignKeyField(Group, null=True)
+    set_teacher = ForeignKeyField(Teacher, null=True)
+    set_admin = BooleanField(default=False)
+
+    @property
+    def is_used(self):
+        return User.select().where(User.invite == self).exists()
 
 
-class Settings(BaseModel):
-    name = CharField(64, primary_key=True)
-    value = BareField(null=True)
-
-
-class PairNameFix(BaseModel):
-    prev_name = CharField(64, primary_key=True)
-    new_name = CharField(64)
+# #################################################################################################################### #
+#                                                                                                                      #
+#                                  Состояния telegram-бота: StorageState, StorageData                                  #
+#                                                                                                                      #
+# #################################################################################################################### #
 
 
 class StorageState(BaseModel):
@@ -176,5 +211,10 @@ class StorageData(BaseModel):
         primary_key = CompositeKey('id', 'key')
 
 
-db.create_tables((Teacher, Group, Cabinet, PairTime, Pair, User, Invite, Settings, PairNameFix, StorageState,
-                  StorageData, Pair.teachers.through_model, Pair.cabinets.through_model))
+DeferredForeignKey.resolve(Invite)
+db.create_tables((
+    Teacher, Group, Cabinet, PairNameFix,
+    Pair, Pair.teachers.through_model, Pair.cabinets.through_model, PairTime,
+    User, Invite,
+    StorageState, StorageData
+))

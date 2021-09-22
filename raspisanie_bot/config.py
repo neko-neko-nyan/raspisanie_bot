@@ -1,7 +1,7 @@
 import os
 import random
 
-JWT_KEY = os.getenv("JWT_KEY")
+JWT_KEY = os.getenvb(b"JWT_KEY")
 if not JWT_KEY:
     JWT_KEY = random.randbytes(64)
 

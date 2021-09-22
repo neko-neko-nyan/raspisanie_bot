@@ -17,21 +17,18 @@ def create_invite(user, data=None, user_data=None):
     data = data or {}
     user_data = user_data or {}
 
-    gri = data.get("gri")
-    tei = data.get("tei")
-
-    isa = user_data.get("admin", "false").lower() != "false" or data.get("isa")
-    if isa and not user.is_admin:
+    set_admin = user_data.get("admin", "false").lower() != "false" or data.get("isa", False)
+    if set_admin and not user.is_admin:
         bot_error("NOT_ADMIN", user=user.tg_id)
 
     if "group" in user_data:
-        gri = get_group_or_bot_error(user, user_data["group"]).id
+        data["gri"] = get_group_or_bot_error(user, user_data["group"]).id
 
     if "teacher" in user_data:
-        tei = get_teacher_or_bot_error(user, user_data["teacher"]).id
+        data["tei"] = get_teacher_or_bot_error(user, user_data["teacher"]).id
 
-    iid = Invite.create(created_by=user).id
-    code = encoded_invite.encode_invite(config.JWT_KEY, iid, gri, tei, isa)
+    invite = Invite.create(author=user, set_group=data.get("gri"), set_teacher=data.get("tei"), set_admin=set_admin)
+    code = encoded_invite.encode_invite(config.JWT_KEY, invite.id)
     link = f"https://t.me/nkrp_bot?start={code}"
 
     img = qrcode.make(link)

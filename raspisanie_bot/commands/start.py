@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 
 from raspisanie_bot import config, encoded_invite
 from raspisanie_bot.bot_errors import bot_error
-from raspisanie_bot.database import Teacher, Invite, Group, User
+from raspisanie_bot.database import Invite, User
 
 
 async def send_help(message: aiogram.types.Message, user: User):
@@ -15,38 +15,38 @@ async def cmd_start(message: aiogram.types.Message, state: FSMContext):
 
     args = message.get_args()
     if args:
-        iid, gri, tei, isa = encoded_invite.decode_invite(config.JWT_KEY, args)
-        invite = Invite.get_or_none(Invite.id == iid, Invite.is_used == False)
+        iid = encoded_invite.decode_invite(config.JWT_KEY, args)
+        invite = Invite.get_or_none(Invite.id == iid)
 
         if invite is None:
-            bot_error("INVITE_USED", invite=iid, user=user.tg_id)
+            bot_error("INVITE_NOT_EXIST", invite=iid, user=user.tg_id)
 
         if user.invite is not None:
-            if user.invite != invite.id:
-                bot_error("ANOTHER_INVITE_USED", invite=invite.id, user=user.tg_id)
+            if user.invite.id != invite.id:
+                bot_error("INVITE_ANOTHER_USED", invite=invite.id, user=user.tg_id)
 
             await message.reply("Вы уже использовали этот код, повторное использование ничего не меняет :(")
 
         else:
-            user.invited_by = invite.created_by
             user.invite = invite
-            invite.is_used = True
 
-            if isa:
+            if invite.set_admin:
+                if invite.is_used:
+                    bot_error("INVITE_USED", user=user.tg_id, invite=invite.id)
+
                 # Если у пользователя забрали права администратора, то все его приглашения, дававшие права
                 # администратора перестанут работать.
-                if not User.get_by_id(invite.created_by).is_admin:
+                if not invite.author.get().is_admin:
                     bot_error("NOT_ADMIN", user=user.tg_id, invite=invite.id)
 
                 user.is_admin = True
 
-            if gri is not None:
-                user.group = Group.get_or_none(Group.id == gri)
+            if invite.set_group is not None:
+                user.group = invite.set_group
 
-            elif tei is not None:
-                user.teacher = Teacher.get_or_none(Teacher.id == tei)
+            elif invite.set_teacher is not None:
+                user.teacher = invite.set_teacher
 
-            invite.save()
             user.save()
             await message.reply("Код приглашения активирован успешно")
 
