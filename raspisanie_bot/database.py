@@ -131,6 +131,15 @@ class PairTime(BaseModel):
 # #################################################################################################################### #
 
 
+class CVPItem(BaseModel):
+    rowid = RowIDField()
+
+    date = DateField()
+    group = ForeignKeyField(Group)
+    start_time = IntegerField()
+    end_time = IntegerField()
+
+
 # #################################################################################################################### #
 #                                                                                                                      #
 #                                     Взаимодействие с пользователем: user, invite                                     #
@@ -222,6 +231,7 @@ DeferredForeignKey.resolve(Invite)
 db.create_tables((
     Teacher, Group, Cabinet, PairNameFix,
     Pair, Pair.teachers.through_model, Pair.cabinets.through_model, PairTime,
+    CVPItem,
     User, Invite,
     StorageState, StorageData
 ))

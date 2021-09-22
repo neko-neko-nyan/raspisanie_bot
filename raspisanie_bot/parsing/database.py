@@ -2,7 +2,7 @@ import datetime
 
 from .parsers import Finder, Handler, SubpagesParsingHandler
 from ..config import feature_enabled
-from ..database import Cabinet, Teacher, Group, PairNameFix, Pair, PairTime
+from ..database import Cabinet, Teacher, Group, PairNameFix, Pair, PairTime, CVPItem
 
 
 class DatabaseFinder(Finder):
@@ -53,11 +53,14 @@ class DatabaseHandler(Handler):
 
     def handle_new_cvp_date(self, date):
         super().handle_new_cvp_date(date)
-        print(f"CVP {date}")
+        CVPItem.delete().where(CVPItem.date == date).execute()
+
+        if feature_enabled("remove_old_data"):
+            CVPItem.delete().where(CVPItem.date < datetime.date.today()).execute()
 
     def handle_cvp_item(self, date, group, start, end):
         super().handle_cvp_item(date, group, start, end)
-        print(f"CVP {date} {group} {start} {end}")
+        CVPItem.create(date=date, group=group, start_time=start, end_time=end)
 
     def handle_new_call_schedule(self):
         super().handle_new_call_schedule()
