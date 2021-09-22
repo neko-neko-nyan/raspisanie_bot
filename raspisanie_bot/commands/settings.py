@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
-from ..bot_utils import get_group_or_bot_error
+from ..bot_utils import get_group_or_bot_error, get_teacher_or_bot_error
 from ..config import feature_enabled
 from ..database import User
 
@@ -65,7 +65,7 @@ async def msg_settings_set_group(message: aiogram.types.Message, state: FSMConte
 
 async def msg_settings_set_teacher(message: aiogram.types.Message, state: FSMContext):
     user = User.from_telegram(message.from_user)
-    teacher = get_group_or_bot_error(user, message.text)
+    teacher = get_teacher_or_bot_error(user, message.text)
 
     user.group = None
     user.teacher = teacher
