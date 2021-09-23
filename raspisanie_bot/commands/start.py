@@ -8,7 +8,7 @@ from ..encoded_invite import decode_invite
 
 
 async def send_help(message: aiogram.types.Message, user: User):
-    await message.answer("В разработке (help_text)")
+    await message.answer("В разработке help_text")
 
 
 async def cmd_start(message: aiogram.types.Message, state: FSMContext):
@@ -26,7 +26,7 @@ async def cmd_start(message: aiogram.types.Message, state: FSMContext):
             if user.invite.rowid != invite.rowid:
                 bot_error("INVITE_ANOTHER_USED", invite=invite, user=user)
 
-            await message.reply("Вы уже использовали этот код, повторное использование ничего не меняет :(")
+            await message.reply("Вы уже использовали этот код, повторное использование ничего не меняет")
 
         else:
             user.invite = invite

@@ -1,7 +1,7 @@
 import aiogram
 import jwt
-from aiogram.utils.markdown import escape_md
 
+from .message_builder import MessageBuilder
 from .config import feature_enabled, JWT_KEY_FOR_ERRORS
 from .encoded_invite import InviteSignatureError
 
@@ -41,8 +41,10 @@ def format_error(name, exception: BaseException = None, **data):
         error = ERRORS["UNKNOWN_ERROR"]
         data["error_name"] = name
 
+    res = MessageBuilder()
+    res.text(error[1])
     if not feature_enabled("debug_info"):
-        return escape_md(error[1])
+        return str(res)
 
     if exception is not None:
         data["exc_type"] = type(exception).__name__
@@ -50,7 +52,8 @@ def format_error(name, exception: BaseException = None, **data):
 
     data["error_code"] = error[0]
     data = jwt.encode(data, JWT_KEY_FOR_ERRORS)
-    return f"{escape_md(error[1])}\n```\nКод ошибки: {error[0]}\nДанные для разработчиков: {escape_md(data)}\n```\n"
+    res.nl().pre("Код ошибки: ", error[0], "\nДанные для разработчиков: ", data)
+    return str(res)
 
 
 async def handle_invite_signature_error(update: aiogram.types.Update, exception: InviteSignatureError):
@@ -61,7 +64,7 @@ async def handle_invite_signature_error(update: aiogram.types.Update, exception:
         else:
             return False
 
-    await message.answer(format_error("INVITE_KEY", exception), parse_mode="MarkdownV2")
+    await message.answer(format_error("INVITE_KEY", exception))
     return True
 
 
@@ -73,7 +76,7 @@ async def handle_bot_error(update: aiogram.types.Update, exception: BotError):
         else:
             return False
 
-    await message.answer(format_error(exception.name, exception.exception, **exception.data), parse_mode="MarkdownV2")
+    await message.answer(format_error(exception.name, exception.exception, **exception.data))
     return True
 
 

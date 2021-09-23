@@ -106,7 +106,7 @@ class PairTime(BaseModel):
 
     @classmethod
     def current(cls):
-        return cls.get_pair(datetime.datetime.now())
+        return cls.by_time(datetime.datetime.now())
 
     @classmethod
     def by_time(cls, curr_time):

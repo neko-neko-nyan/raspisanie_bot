@@ -5,6 +5,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
 from ..bot_utils import get_group_or_bot_error, get_teacher_or_bot_error
+from ..message_builder import MessageBuilder
 from ..config import feature_enabled
 from ..database import User
 
@@ -22,17 +23,20 @@ async def cmd_settings(message: aiogram.types.Message, state: FSMContext):
     if feature_enabled("settings_notifications"):
         kb.add(InlineKeyboardButton("Уведомления", callback_data=settings_cb.new("notifications")))
 
-    text = ["Тип: "]
+    res = MessageBuilder().text("Тип: ")
     if user.group:
-        text += ["Студент\nГруппа: ", user.group.string_value]
+        res.text("Студент\nГруппа: ", user.group.string_value)
 
     elif user.teacher:
-        text += ["Преподаватель\nФИО: ", user.teacher.short_name]
+        res.text("Преподаватель\nФИО: ", user.teacher.short_name)
 
     else:
-        text.append("Не указан")
+        res.text("Не указан")
 
-    await message.answer(''.join(text), reply_markup=kb)
+    if user.is_admin:
+        res.text("\nВы являетесь администратором.")
+
+    await message.answer(str(res), reply_markup=kb)
     await state.reset_state()
 
 
@@ -75,7 +79,7 @@ async def msg_settings_set_teacher(message: aiogram.types.Message, state: FSMCon
 
 
 async def cc_settings_notifications(call: aiogram.types.CallbackQuery):
-    await call.answer("В разработке (notifications)", show_alert=True)
+    await call.answer("В разработке notifications", show_alert=True)
 
 
 def install_settings(dp, all_commands):

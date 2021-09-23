@@ -12,7 +12,7 @@ async def cmd_admin(message: aiogram.types.Message, state: FSMContext):
     if not user.is_admin:
         bot_error("NOT_ADMIN", user=user)
 
-    await message.answer("В разработке (admin)")
+    await message.answer("В разработке admin")
     await state.reset_state()
 
 

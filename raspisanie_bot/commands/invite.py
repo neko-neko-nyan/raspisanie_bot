@@ -9,6 +9,7 @@ from aiogram.utils.callback_data import CallbackData
 
 from ..bot_errors import bot_error
 from ..bot_utils import get_group_or_bot_error, get_teacher_or_bot_error
+from ..message_builder import MessageBuilder
 from ..config import INVITE_SIGN_KEY
 from ..database import Invite, User, Group, Teacher
 from ..encoded_invite import encode_invite
@@ -67,21 +68,21 @@ def make_invite_message(user, data=None):
 
     kb.add(InlineKeyboardButton("Создать", callback_data=invite_cb.new("create")))
 
-    text = ["Тип: "]
+    res = MessageBuilder().text("Тип: ")
     if "gri" in data:
         group = Group.get_by_id(data["gri"])
-        text += ["Студенты\nГруппа: ", group.string_value]
+        res.text("Студенты\nГруппа: ", group.string_value)
 
     elif "tei" in data:
         teacher = Teacher.get_by_id(data["tei"])
-        text += ["Преподаватель\nФИО: ", teacher.full_name]
+        res.text("Преподаватель\nФИО: ", teacher.full_name)
     else:
-        text.append("Не указан")
+        res.text("Не указан")
 
     if data.get("isa"):
-        text.append("\nПользователь СТАНЕТ администратором")
+        res.text("\nПользователь СТАНЕТ администратором")
 
-    return ''.join(text), kb
+    return str(res), kb
 
 
 async def cmd_invite(message: aiogram.types.Message, state: FSMContext):

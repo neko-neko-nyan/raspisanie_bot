@@ -1,12 +1,13 @@
+import datetime
+
 import aiogram
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.utils.markdown import escape_md
 
 from ..bot_errors import bot_error
 from ..bot_utils import get_group_or_none, get_teacher_or_none
-from ..database import User, Group, Cabinet, Teacher, Pair
-
+from ..message_builder import MessageBuilder
+from ..database import User, Group, Cabinet, Teacher, Pair, PairTime
 
 MONTH_NAMES = [
     None, "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября",
@@ -25,9 +26,6 @@ def is_allow_hide_pair_comp(tm, gc, query):
 
 
 async def do_search_query(message: aiogram.types.Message, user, search_type, target):
-    res = []
-    prev_date = None
-
     if search_type == 'group':
         query = Pair.group == target
         allow_hide = True
@@ -43,25 +41,41 @@ async def do_search_query(message: aiogram.types.Message, user, search_type, tar
                                .where(Pair.teachers.through_model.teacher_id == target.rowid))
         allow_hide = is_allow_hide_pair_comp(Pair.teachers.through_model, Pair.teachers.through_model.teacher_id, query)
 
+    now = datetime.datetime.now()
+    in_pair, current_pair = PairTime.by_time(now)
+    today = now.date()
+
+    prev_date = None
+    res = MessageBuilder()
+
     for pair in Pair.select(Pair, Group).join(Group).where(query).order_by(Pair.date, Pair.pair_number):
         if pair.date != prev_date:
-            res.append(f"__{pair.date.day} {MONTH_NAMES[pair.date.month]}__\n")
+            res.underline(pair.date.day, " ", MONTH_NAMES[pair.date.month]).nl()
             prev_date = pair.date
 
-        res.append(f"{pair.pair_number} *{escape_md(pair.name)}*")
+        if pair.date == today and pair.pair_number == current_pair.pair_number:
+            res.code(pair.pair_number)
+        else:
+            res.text(pair.pair_number)
+
+        res.raw(' ').bold(pair.name)
 
         if search_type != 'group':
-            res.append(f" {escape_md(pair.group.string_value)}")
+            res.raw(' ').text(pair.group.string_value)
 
         if search_type != 'teacher' or not allow_hide:
-            res += [' ', ', '.join((escape_md(i.short_name) for i in pair.teachers))]
+            for i in pair.teachers:
+                res.raw(' ')
+                res.text(i.short_name)
 
         if search_type != 'cabinet' or not allow_hide:
-            res += [' ', ', '.join((str(i.number) for i in pair.cabinets))]
+            for i in pair.cabinets:
+                res.raw(' ')
+                res.text(i.number)
 
-        res.append('\n')
+        res.nl()
 
-    await message.answer(''.join(res), parse_mode="MarkdownV2")
+    await message.answer(str(res))
 
 
 async def do_search(message: aiogram.types.Message, user, text):
@@ -107,7 +121,7 @@ async def cmd_search(message: aiogram.types.Message, state: FSMContext):
         await state.reset_state()
 
     else:
-        await message.answer("Введите текст поиска (преподаватель, группа или кабинет)")
+        await message.answer("Введите текст поиска \\(преподаватель, группа или кабинет\\)")
         await SearchStates.waiting_for_text.set()
 
 

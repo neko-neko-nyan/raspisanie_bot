@@ -8,7 +8,7 @@ from ..database import User
 async def cmd_report(message: aiogram.types.Message, state: FSMContext):
     User.from_telegram(message.from_user)
 
-    await message.answer("В разработке (report)")
+    await message.answer("В разработке report")
     await state.reset_state()
 
 

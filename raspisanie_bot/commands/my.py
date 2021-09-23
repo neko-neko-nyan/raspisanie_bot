@@ -11,7 +11,7 @@ async def cmd_my(message: aiogram.types.Message, state: FSMContext):
     if not user.is_configured():
         bot_error("NOT_CONFIGURED", user=user)
 
-    await message.answer("В разработке (my)")
+    await message.answer("В разработке my")
     await state.reset_state()
 
 

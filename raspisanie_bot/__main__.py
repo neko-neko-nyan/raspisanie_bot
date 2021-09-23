@@ -16,7 +16,7 @@ UPDATE_SERVICE = UpdateService()
 async def main():
     UPDATE_SERVICE.start()
 
-    bot = aiogram.Bot(token=BOT_TOKEN)
+    bot = aiogram.Bot(token=BOT_TOKEN, parse_mode="MarkdownV2")
     dp = aiogram.Dispatcher(bot, storage=SQLiteStorage())
     dp.setup_middleware(LoggingMiddleware())
 
@@ -24,7 +24,7 @@ async def main():
     install_error_handlers(dp)
 
     await bot.set_my_commands(commands)
-    await dp.start_polling()
+    await dp.start_polling(timeout=60)
 
 
 if __name__ == '__main__':
