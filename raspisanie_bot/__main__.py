@@ -14,7 +14,7 @@ UPDATE_SERVICE = UpdateService()
 
 
 async def main():
-    UPDATE_SERVICE.start()
+    # UPDATE_SERVICE.start()
 
     bot = aiogram.Bot(token=BOT_TOKEN, parse_mode="MarkdownV2")
     dp = aiogram.Dispatcher(bot, storage=SQLiteStorage())

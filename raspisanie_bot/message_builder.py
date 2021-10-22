@@ -1,3 +1,8 @@
+MONTH_NAMES = [
+    "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"
+]
+
+
 class MessageBuilder:
     QUOTE_NONE = {}
     QUOTE_TEXT = str.maketrans({_k: '\\' + _k for _k in "_*[]()~`>#+-=|{}.!\\"})
@@ -33,11 +38,15 @@ class MessageBuilder:
             .text(*value, escape=escape, quote=self.QUOTE_PRE if char == '`' else self.QUOTE_TEXT)\
             .raw(char)
 
+    # ==== Complex formatting ====
+
     def link(self, value, link) -> 'MessageBuilder':
         return self.raw('[', str(value), '](').text(link, quote=self.QUOTE_URL).raw(')')
 
     def pre(self, *value, language="") -> 'MessageBuilder':
         return self.raw("```", language, "\n").text(*value, quote=self.QUOTE_PRE).raw("\n```")
+
+    # ==== Simple formatting ====
 
     def bold(self, *value, escape=True) -> 'MessageBuilder':
         return self._inline('*', *value, escape=escape)
@@ -53,3 +62,17 @@ class MessageBuilder:
 
     def code(self, *value, escape=True) -> 'MessageBuilder':
         return self._inline('`', *value, escape=escape)
+
+    no_bold = bold
+    no_italic = italic
+    no_underline = underline
+    no_strikethrough = strikethrough
+    no_code = code
+
+    # ==== Formatting objects ====
+
+    def date(self, date):
+        return self.text(date.day, " ", MONTH_NAMES[date.month - 1])
+
+    def time(self, time):
+        return self.text(time // 60, ':', format(time % 60, "02"))

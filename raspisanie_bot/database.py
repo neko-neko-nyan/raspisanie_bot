@@ -123,6 +123,18 @@ class PairTime(BaseModel):
 
         return curr_time >= pt.start_time, pt
 
+    @property
+    def is_current(self):
+        curr_time = datetime.datetime.now()
+        curr_time = curr_time.hour * 60 + curr_time.minute
+        return self.start_time <= curr_time < self.end_time
+
+    @property
+    def is_next(self):
+        curr_time = datetime.datetime.now()
+        curr_time = curr_time.hour * 60 + curr_time.minute
+        return curr_time < self.start_time
+
 
 # #################################################################################################################### #
 #                                                                                                                      #

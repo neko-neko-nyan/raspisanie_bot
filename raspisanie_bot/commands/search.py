@@ -6,13 +6,8 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 from ..bot_errors import bot_error
 from ..bot_utils import get_group_or_none, get_teacher_or_none
-from ..message_builder import MessageBuilder
 from ..database import User, Group, Cabinet, Teacher, Pair, PairTime
-
-MONTH_NAMES = [
-    None, "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября",
-    "Декабря",
-]
+from ..message_builder import MessageBuilder
 
 
 def is_allow_hide_pair_comp(tm, gc, query):
@@ -50,7 +45,7 @@ async def do_search_query(message: aiogram.types.Message, user, search_type, tar
 
     for pair in Pair.select(Pair, Group).join(Group).where(query).order_by(Pair.date, Pair.pair_number):
         if pair.date != prev_date:
-            res.underline(pair.date.day, " ", MONTH_NAMES[pair.date.month]).nl()
+            res.underline().date(pair.date).no_underline().nl()
             prev_date = pair.date
 
         if pair.date == today and pair.pair_number == current_pair.pair_number:
