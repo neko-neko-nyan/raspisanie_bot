@@ -8,7 +8,7 @@ from ..encoded_invite import decode_invite
 
 
 async def send_help(message: aiogram.types.Message, user: User):
-    await message.answer("В разработке help_text")
+    await message.answer("В разработке help_text", parse_mode="")
 
 
 async def cmd_start(message: aiogram.types.Message, state: FSMContext):
@@ -69,10 +69,10 @@ async def cmd_cancel(message: aiogram.types.Message, state: FSMContext):
 
 def install_cancel(dp):
     dp.register_message_handler(cmd_cancel, lambda msg: msg.text.lower().strip() == 'отмена', state='*')
+    dp.register_message_handler(cmd_cancel, commands="cancel", state='*')
 
 
 def install_start(dp, all_commands):
-    dp.register_message_handler(cmd_cancel, commands="cancel", state='*')
     all_commands.append(aiogram.types.BotCommand("/cancel", "Отмена действия"))
 
     dp.register_message_handler(cmd_start, commands="start", state='*')

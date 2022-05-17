@@ -179,7 +179,7 @@ async def cc_invite_create(call: aiogram.types.CallbackQuery, state: FSMContext)
         data = dict(st)
 
     file, link = create_invite(user, data)
-    await call.message.answer_photo(file, link)
+    await call.message.answer_photo(file, link, parse_mode="")
 
     await call.bot.delete_message(call.message.chat.id, data["msg_id"])
     await call.answer()
