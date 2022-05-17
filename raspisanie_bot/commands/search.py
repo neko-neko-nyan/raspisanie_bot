@@ -70,7 +70,11 @@ async def do_search_query(message: aiogram.types.Message, user, search_type, tar
 
         res.nl()
 
-    await message.answer(str(res))
+    res = str(res)
+    if not res:
+        res = "Нет пар"
+
+    await message.answer(res)
 
 
 async def do_search(message: aiogram.types.Message, user, text):
