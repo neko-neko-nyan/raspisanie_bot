@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="database.sqlite">
-  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.29">
+  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.39">
     <root id="1">
       <ServerVersion>3.34.0</ServerVersion>
     </root>
@@ -1374,7 +1374,6 @@
     </foreign-key>
     <index id="510" parent="491" name="cabinet_owner_id">
       <ColNames>owner_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="511" parent="491">
       <ColNames>rowid</ColNames>
@@ -1412,7 +1411,6 @@
     </foreign-key>
     <index id="518" parent="492" name="cvp_item_group_id">
       <ColNames>group_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="519" parent="492">
       <ColNames>rowid</ColNames>
@@ -1449,7 +1447,6 @@
     </foreign-key>
     <index id="526" parent="493" name="group_owner_id">
       <ColNames>owner_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="527" parent="493">
       <ColNames>rowid</ColNames>
@@ -1495,15 +1492,12 @@
     </foreign-key>
     <index id="536" parent="494" name="invite_author_id">
       <ColNames>author_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="537" parent="494" name="invite_set_group_id">
       <ColNames>set_group_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="538" parent="494" name="invite_set_teacher_id">
       <ColNames>set_teacher_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="539" parent="494">
       <ColNames>rowid</ColNames>
@@ -1543,14 +1537,10 @@
       <ColNames>date
 pair_number
 group_id</ColNames>
-      <ColumnCollations>
-
-</ColumnCollations>
       <Unique>1</Unique>
     </index>
     <index id="547" parent="495" name="pair_group_id">
       <ColNames>group_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="548" parent="495">
       <ColNames>rowid</ColNames>
@@ -1586,17 +1576,13 @@ group_id</ColNames>
     <index id="554" parent="496" name="paircabinetthrough_pair_id_cabinet_id">
       <ColNames>pair_id
 cabinet_id</ColNames>
-      <ColumnCollations>
-</ColumnCollations>
       <Unique>1</Unique>
     </index>
     <index id="555" parent="496" name="paircabinetthrough_pair_id">
       <ColNames>pair_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="556" parent="496" name="paircabinetthrough_cabinet_id">
       <ColNames>cabinet_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="557" parent="496">
       <ColNames>id</ColNames>
@@ -1614,7 +1600,6 @@ cabinet_id</ColNames>
     </column>
     <index id="560" parent="497" name="sqlite_autoindex_pair_name_fix_1">
       <ColNames>prev_name</ColNames>
-      <ColumnCollations></ColumnCollations>
       <NameSurrogate>1</NameSurrogate>
       <Unique>1</Unique>
     </index>
@@ -1653,17 +1638,13 @@ cabinet_id</ColNames>
     <index id="567" parent="498" name="pairteacherthrough_pair_id_teacher_id">
       <ColNames>pair_id
 teacher_id</ColNames>
-      <ColumnCollations>
-</ColumnCollations>
       <Unique>1</Unique>
     </index>
     <index id="568" parent="498" name="pairteacherthrough_pair_id">
       <ColNames>pair_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="569" parent="498" name="pairteacherthrough_teacher_id">
       <ColNames>teacher_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="570" parent="498">
       <ColNames>id</ColNames>
@@ -1725,8 +1706,6 @@ teacher_id</ColNames>
     <index id="583" parent="501" name="sqlite_autoindex_storage_data_1">
       <ColNames>id
 key</ColNames>
-      <ColumnCollations>
-</ColumnCollations>
       <NameSurrogate>1</NameSurrogate>
       <Unique>1</Unique>
     </index>
@@ -1747,7 +1726,6 @@ key</ColNames>
     </column>
     <index id="587" parent="502" name="sqlite_autoindex_storage_state_1">
       <ColNames>id</ColNames>
-      <ColumnCollations></ColumnCollations>
       <NameSurrogate>1</NameSurrogate>
       <Unique>1</Unique>
     </index>
@@ -1839,15 +1817,12 @@ key</ColNames>
     </foreign-key>
     <index id="606" parent="504" name="user_group_id">
       <ColNames>group_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="607" parent="504" name="user_teacher_id">
       <ColNames>teacher_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <index id="608" parent="504" name="user_invite_id">
       <ColNames>invite_id</ColNames>
-      <ColumnCollations></ColumnCollations>
     </index>
     <key id="609" parent="504">
       <ColNames>rowid</ColNames>

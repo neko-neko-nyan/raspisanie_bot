@@ -1,11 +1,12 @@
-aiogram~=2.14.3
-aiohttp~=3.7.4.post0
+aiogram
+aiohttp
 
-dateparser~=1.0.0
-lxml~=4.6.3
+dateparser
+lxml
 
-PyJWT~=2.1.0
-qrcode~=7.3
+PyJWT
+qrcode
 
-peewee~=3.14.4
-pdfminer.six~=20201018
+peewee
+pdfminer.six
+Pillow
