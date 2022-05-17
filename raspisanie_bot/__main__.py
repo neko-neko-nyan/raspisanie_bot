@@ -14,7 +14,7 @@ UPDATE_SERVICE = UpdateService()
 
 
 async def main():
-    # UPDATE_SERVICE.start()
+    UPDATE_SERVICE.start()
 
     bot = aiogram.Bot(token=BOT_TOKEN, parse_mode="MarkdownV2")
     dp = aiogram.Dispatcher(bot, storage=SQLiteStorage())
@@ -29,4 +29,4 @@ async def main():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    asyncio.get_event_loop().run_until_complete(main())
+    asyncio.run(main())
