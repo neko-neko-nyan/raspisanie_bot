@@ -84,8 +84,16 @@ class DatabaseHandler(Handler):
 
         pair = Pair(date=date, pair_number=pair_number, group=group, name=pair)
         pair.save()
-        pair.teachers.add(teachers)
-        pair.cabinets.add(cabinets)
+
+        try:
+            pair.teachers.add(teachers)
+        except peewee.IntegrityError:
+            pass
+
+        try:
+            pair.cabinets.add(cabinets)
+        except peewee.IntegrityError:
+            pass
 
 
 class UniversalHandler(DatabaseHandler, SubpagesParsingHandler):
