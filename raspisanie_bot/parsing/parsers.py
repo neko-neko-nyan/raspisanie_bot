@@ -207,19 +207,46 @@ class TimetableParser(ParserBase):
         if table[0].tag == 'tbody':
             table = table[0]
 
+        skipped = {}  # pair_no -> [gi]
         groups = []
         for gn in table[0][1:]:
             groups.append(self.finder.find_group(gn.text_content()))
 
         for tr in table[1:]:
             pair = self.finder.find_pair_number(tr[0].text_content())
+            skipped.setdefault(pair, [])
             if pair is None:
                 continue
 
-            for gi, td in enumerate(tr[1:]):
-                group = groups[gi]
+            curr_spans = 0
+            next_common_pair = 0
+            prev_text = None
+            for gi, group in enumerate(groups):
+                if gi in skipped[pair]:
+                    curr_spans += 1
+                    continue
+
+                if next_common_pair:
+                    next_common_pair -= 1
+                    curr_spans += 1
+                    if group is not None and prev_text is not None:
+                        self.parse_pair(date, group, pair, prev_text)
+                    continue
+
+                if gi + 1 - curr_spans >= len(tr):
+                    break
+                td = tr[gi + 1 - curr_spans]
+
+                if 'rowspan' in td.attrib:
+                    for i in range(int(td.attrib['rowspan']) - 1):
+                        skipped.setdefault(pair + i + 1, []).append(gi)
+
+                if 'colspan' in td.attrib:
+                    next_common_pair = int(td.attrib['colspan']) - 1
+
                 if group is not None:
-                    self.parse_pair(date, group, pair, td.text_content())
+                    prev_text = td.text_content()
+                    self.parse_pair(date, group, pair, prev_text)
 
     def parse_pair(self, date, group, pair_number, text):
         array = self.NOT_WORD_RE.sub(' ', text).strip().split()
