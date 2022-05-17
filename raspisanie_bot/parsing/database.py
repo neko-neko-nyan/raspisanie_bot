@@ -1,5 +1,7 @@
 import datetime
 
+import peewee
+
 from .parsers import Finder, Handler, SubpagesParsingHandler
 from ..config import feature_enabled
 from ..database import Cabinet, Teacher, Group, PairNameFix, Pair, PairTime, CVPItem
