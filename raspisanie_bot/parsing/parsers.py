@@ -102,7 +102,7 @@ class CallScheduleParser(ParserBase):
 
 
 class CVPParser(ParserBase):
-    NORM_GROUPS_RE = re.compile('[^0-9а-яА-Я-]+')
+    NORM_GROUPS_RE = re.compile('[^\\dа-яА-Я-]+')
 
     def parse_cvp(self, content: bytes):
         rsrcmgr = pdfminer.pdfinterp.PDFResourceManager()
@@ -212,11 +212,18 @@ class TimetableParser(ParserBase):
         for gn in table[0][1:]:
             groups.append(self.finder.find_group(gn.text_content()))
 
+        prev_pair = None
         for tr in table[1:]:
             pair = self.finder.find_pair_number(tr[0].text_content())
-            skipped.setdefault(pair, [])
             if pair is None:
-                continue
+                if prev_pair is None:
+                    continue
+
+                pair = prev_pair + 1
+
+            prev_pair = pair
+
+            skipped.setdefault(pair, [])
 
             curr_spans = 0
             next_common_pair = 0
@@ -369,6 +376,9 @@ class TimetableUpdater(AsyncParser, TimetableParser, CallScheduleParser, CVPPars
             self.LOG.info("Timetable not updated due to cache")
             return
 
+        if feature_enabled("remove_old_data"):
+            self.handler.remove_old_data()
+
         self.parse_timetable(content.decode(encoding))
         self._last_tt_md5 = md5
 
@@ -460,6 +470,9 @@ class Handler:
 
     def handle_parsed_pair(self, date, group, pair_number, pair, teachers, cabinets, subgroup: int,
                            is_substitution: bool):
+        pass
+
+    def remove_old_data(self):
         pass
 
 

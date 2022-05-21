@@ -57,9 +57,6 @@ class DatabaseHandler(Handler):
         super().handle_new_cvp_date(date)
         CVPItem.delete().where(CVPItem.date == date).execute()
 
-        if feature_enabled("remove_old_data"):
-            CVPItem.delete().where(CVPItem.date < datetime.date.today()).execute()
-
     def handle_cvp_item(self, date, group, start, end):
         super().handle_cvp_item(date, group, start, end)
         CVPItem.create(date=date, group=group, start_time=start, end_time=end)
@@ -78,9 +75,6 @@ class DatabaseHandler(Handler):
         if old_date is None:
             Pair.delete().where(Pair.date == new_date).execute()
 
-            if feature_enabled("remove_old_data"):
-                Pair.delete().where(Pair.date < datetime.date.today()).execute()
-
     def handle_parsed_pair(self, date, group, pair_number, pair, teachers, cabinets, subgroup, is_substitution):
         super().handle_parsed_pair(date, group, pair_number, pair, teachers, cabinets, subgroup, is_substitution)
 
@@ -96,6 +90,10 @@ class DatabaseHandler(Handler):
             pair.cabinets.add(cabinets)
         except peewee.IntegrityError:
             pass
+
+    def remove_old_data(self):
+        CVPItem.delete().where(CVPItem.date < datetime.date.today()).execute()
+        Pair.delete().where(Pair.date < datetime.date.today()).execute()
 
 
 class UniversalHandler(DatabaseHandler, SubpagesParsingHandler):
