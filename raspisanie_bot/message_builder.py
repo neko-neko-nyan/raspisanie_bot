@@ -17,6 +17,16 @@ class MessageBuilder:
     def __str__(self):
         return ''.join(self._parts)
 
+    @property
+    def empty(self):
+        return not self._parts
+
+    # noinspection PyDefaultArgument
+    def or_text(self, *value, escape=True, quote=QUOTE_TEXT):
+        if self.empty:
+            self.text(*value, escape=escape, quote=quote)
+        return self
+
     def raw(self, *value) -> 'MessageBuilder':
         self._parts.extend(value)
         return self

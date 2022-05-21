@@ -7,8 +7,16 @@ from ..database import Invite, User
 from ..encoded_invite import decode_invite
 
 
+HELP_TEXT = """\
+⭐ Нажмите кнопку *меню* в левом нижнем углу чтобы открыть список команд\\.
+⭐ Нажмите /settings чтобы зайти в настройки и указать свою группу\\. После этого ваше расписание будет доступно по команде /my\\.
+⭐ /search \\- поиск по группе, фамилии преподавателя или номеру кабинета\\.
+⭐ /time \\- посмотреть расписание звонков\\.
+"""
+
+
 async def send_help(message: aiogram.types.Message, user: User):
-    await message.answer("В разработке help_text", parse_mode="")
+    await message.answer(HELP_TEXT)
 
 
 async def cmd_start(message: aiogram.types.Message, state: FSMContext):

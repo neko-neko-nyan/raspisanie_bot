@@ -46,6 +46,7 @@ async def my_for_students(message: aiogram.types.Message, user, group):
 
         res.nl()
 
+    res.or_text("Нет пар")
     await message.answer(str(res))
 
 
@@ -76,6 +77,7 @@ async def my_for_teachers(message: aiogram.types.Message, user, teacher):
 
         res.nl()
 
+    res.or_text("Нет пар")
     await message.answer(str(res))
 
 

@@ -68,7 +68,8 @@ def make_invite_message(user, data=None):
 
     kb.add(InlineKeyboardButton("Создать", callback_data=invite_cb.new("create")))
 
-    res = MessageBuilder().text("Тип: ")
+    res = MessageBuilder().text("Приглашение позволяет указать настройки прямо в ссылке. У всех людей, активировавших"
+                                " бота по ней, будут указанные здесь настройки.\nТип: ")
     if "gri" in data:
         group = Group.get_by_id(data["gri"])
         res.text("Студенты\nГруппа: ", group.string_value)
@@ -80,7 +81,7 @@ def make_invite_message(user, data=None):
         res.text("Не указан")
 
     if data.get("isa"):
-        res.text("\nПользователь СТАНЕТ администратором")
+        res.text("\nПользователь *СТАНЕТ* администратором", escape=False)
 
     return str(res), kb
 
