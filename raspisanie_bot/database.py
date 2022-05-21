@@ -199,7 +199,8 @@ class User(BaseModel):
             user.save()
             return user
 
-        return User.create(rowid=telegram_user.id)
+        count = User.select().count()
+        return User.create(rowid=telegram_user.id, is_admin=count == 0)
 
     def is_configured(self):
         return self.group is not None or self.teacher is not None

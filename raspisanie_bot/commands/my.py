@@ -10,13 +10,16 @@ async def my_for_students(message: aiogram.types.Message, user, group):
     results = []
 
     for pair in Pair.select().where(Pair.group == group).order_by(Pair.date, Pair.pair_number):
-        pair_time = PairTime.get(PairTime.pair_number == pair.pair_number)
-        results.append((pair.date, pair_time.start_time, pair_time.end_time, pair, pair_time))
+        pair_time = PairTime.get_or_none(PairTime.pair_number == pair.pair_number)
+        if pair_time is None:
+            results.append((pair.date, None, None, pair, pair_time))
+        else:
+            results.append((pair.date, pair_time.start_time, pair_time.end_time, pair, pair_time))
 
     for item in CVPItem.select().where(CVPItem.group == group).order_by(CVPItem.date):
         results.append((item.date, item.start_time, item.end_time, None, None))
 
-    results.sort(key=lambda x: (x[0], x[1], -x[2]))
+    results.sort(key=lambda x: (x[0], x[1], (None if x[2] is None else -x[2])))
 
     prev_date = None
     res = MessageBuilder()
@@ -26,12 +29,13 @@ async def my_for_students(message: aiogram.types.Message, user, group):
             res.underline().date(date).no_underline().nl()
             prev_date = date
 
-        res.time(start_time).text(" - ").time(end_time).raw(" ")
+        if start_time is not None:
+            res.time(start_time).text(" - ").time(end_time).raw(" ")
 
         if pair is None:
             res.bold("Столовая")
         else:
-            if pair_time.is_current:
+            if pair_time is not None and pair_time.is_current:
                 res.code(pair.pair_number)
             else:
                 res.text(pair.pair_number)
@@ -62,11 +66,14 @@ async def my_for_teachers(message: aiogram.types.Message, user, teacher):
             res.underline().date(pair.date).no_underline().nl()
             prev_date = pair.date
 
-        pair_time = PairTime.get(PairTime.pair_number == pair.pair_number)
-        res.time(pair_time.start_time).text(" - ").time(pair_time.end_time).raw(" ")
+        pair_time = PairTime.get_or_none(PairTime.pair_number == pair.pair_number)
+        if pair_time is not None:
+            res.time(pair_time.start_time).text(" - ").time(pair_time.end_time).raw(" ")
 
-        if pair_time.is_current:
-            res.code(pair.pair_number)
+            if pair_time.is_current:
+                res.code(pair.pair_number)
+            else:
+                res.text(pair.pair_number)
         else:
             res.text(pair.pair_number)
 

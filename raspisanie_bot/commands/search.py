@@ -48,7 +48,11 @@ async def do_search_query(message: aiogram.types.Message, user, search_type, tar
             res.underline().date(pair.date).no_underline().nl()
             prev_date = pair.date
 
-        if pair.date == today and pair.pair_number == current_pair.pair_number:
+        pair_time = PairTime.get_or_none(PairTime.pair_number == pair.pair_number)
+        if pair_time is not None:
+            res.time(pair_time.start_time).text(" - ").time(pair_time.end_time).raw(" ")
+
+        if pair.date == today and current_pair is not None and pair.pair_number == current_pair.pair_number:
             res.code(pair.pair_number)
         else:
             res.text(pair.pair_number)
@@ -127,26 +131,8 @@ async def msg_search_text(message: aiogram.types.Message, state: FSMContext):
     await state.finish()
 
 
-async def cmd_search_me(message: aiogram.types.Message, state: FSMContext):
-    user = User.from_telegram(message.from_user)
-
-    if user.group is not None:
-        await do_search_query(message, user, 'group', Group.get_by_id(user.group))
-
-    elif user.teacher is not None:
-        await do_search_query(message, user, 'teacher', Teacher.get_by_id(user.teacher))
-
-    else:
-        bot_error("NOT_CONFIGURED", user=user)
-
-    await state.reset_state()
-
-
 def install_search(dp, all_commands):
     dp.register_message_handler(cmd_search, commands="search", state='*')
     all_commands.append(aiogram.types.BotCommand("/search", "Найти группу, преподавателя или кабинет"))
-
-    dp.register_message_handler(cmd_search_me, commands="search_me", state='*')
-    all_commands.append(aiogram.types.BotCommand("/search_me", "Найти себя"))
 
     dp.register_message_handler(msg_search_text, state=SearchStates.waiting_for_text)
