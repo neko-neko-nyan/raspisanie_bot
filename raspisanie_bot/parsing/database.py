@@ -16,7 +16,7 @@ class DatabaseFinder(Finder):
             return None
 
         if feature_enabled("create_missing_persist"):
-            return Cabinet.get_or_create(rowid=number)[0]
+            return Cabinet.get_or_create(number=number)[0]
         return Cabinet.get_or_none(Cabinet.number == number)
 
     def find_teacher(self, surname, name, patronymic):
