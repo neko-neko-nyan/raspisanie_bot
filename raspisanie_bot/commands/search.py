@@ -27,7 +27,7 @@ async def do_search_query(message: aiogram.types.Message, user, search_type, tar
 
     elif search_type == 'cabinet':
         query = Pair.rowid.in_(Pair.cabinets.through_model.select(Pair.cabinets.through_model.pair_id)
-                               .where(Pair.cabinets.through_model.cabinet_id == target.rowid))
+                               .where(Pair.cabinets.through_model.cabinet_id == target.number))
         allow_hide = is_allow_hide_pair_comp(Pair.cabinets.through_model, Pair.cabinets.through_model.cabinet_id, query)
 
     else:
@@ -91,7 +91,7 @@ async def do_search(message: aiogram.types.Message, user, text):
         pass
 
     else:
-        cabinet = Cabinet.get_or_none(Cabinet.rowid == cabinet)
+        cabinet = Cabinet.get_or_none(Cabinet.number == cabinet)
         if cabinet is not None:
             await do_search_query(message, user, 'cabinet', cabinet)
             return

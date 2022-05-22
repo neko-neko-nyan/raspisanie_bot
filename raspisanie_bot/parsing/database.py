@@ -4,7 +4,7 @@ import peewee
 
 from .parsers import Finder, Handler, SubpagesParsingHandler
 from ..config import feature_enabled
-from ..database import Cabinet, Teacher, Group, PairNameFix, Pair, PairTime, CVPItem
+from ..database import Cabinet, Teacher, Group, Pair, PairTime, CVPItem
 
 
 class DatabaseFinder(Finder):
@@ -16,8 +16,8 @@ class DatabaseFinder(Finder):
             return None
 
         if feature_enabled("create_missing_persist"):
-            return Cabinet.get_or_create(rowid=number, floor=number // 100, name="")[0]
-        return Cabinet.get_or_none(Cabinet.rowid == number)
+            return Cabinet.get_or_create(rowid=number)[0]
+        return Cabinet.get_or_none(Cabinet.number == number)
 
     def find_teacher(self, surname, name, patronymic):
         surname, name, patronymic = super().find_teacher(surname, name, patronymic)
@@ -43,9 +43,10 @@ class DatabaseFinder(Finder):
     def find_pair(self, text):
         text = super().find_pair(text)
 
-        fix = PairNameFix.get_or_none(PairNameFix.prev_name == text)
-        if fix:
-            return fix.new_name
+        # TODO: pair name fix (config)
+        # fix = PairNameFix.get_or_none(PairNameFix.prev_name == text)
+        # if fix:
+        #     return fix.new_name
 
         return text
 

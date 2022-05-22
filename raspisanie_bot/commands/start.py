@@ -30,34 +30,17 @@ async def cmd_start(message: aiogram.types.Message, state: FSMContext):
         if invite is None:
             bot_error("INVITE_NOT_EXIST", invite=iid, user=user)
 
-        if user.invite is not None:
-            if user.invite.rowid != invite.rowid:
-                bot_error("INVITE_ANOTHER_USED", invite=invite, user=user)
+        if invite.set_admin:
+            user.is_admin = True
 
-            await message.reply("Вы уже использовали этот код, повторное использование ничего не меняет")
+        if invite.set_group is not None:
+            user.group = invite.set_group
 
-        else:
-            user.invite = invite
+        elif invite.set_teacher is not None:
+            user.teacher = invite.set_teacher
 
-            if invite.set_admin:
-                if invite.is_used:
-                    bot_error("INVITE_USED", user=user, invite=invite)
-
-                # Если у пользователя забрали права администратора, то все его приглашения, дававшие права
-                # администратора перестанут работать.
-                if not invite.author.get().is_admin:
-                    bot_error("NOT_ADMIN", user=user, invite=invite)
-
-                user.is_admin = True
-
-            if invite.set_group is not None:
-                user.group = invite.set_group
-
-            elif invite.set_teacher is not None:
-                user.teacher = invite.set_teacher
-
-            user.save()
-            await message.reply("Код приглашения активирован успешно")
+        user.save()
+        await message.reply("Код приглашения активирован успешно")
 
     await send_help(message, user)
     await state.reset_state()

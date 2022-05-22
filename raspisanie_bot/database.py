@@ -25,11 +25,6 @@ class BaseModel(Model):
 # #################################################################################################################### #
 
 
-class PairNameFix(BaseModel):
-    prev_name = CharField(64, primary_key=True)
-    new_name = CharField(64)
-
-
 class Teacher(BaseModel):
     rowid = RowIDField()
 
@@ -49,8 +44,6 @@ class Teacher(BaseModel):
 class Group(BaseModel):
     rowid = RowIDField()
 
-    owner = ForeignKeyField(Teacher, null=True)
-
     course = IntegerField()
     group = CharField(max_length=8)
     subgroup = IntegerField()
@@ -64,15 +57,7 @@ class Group(BaseModel):
 
 
 class Cabinet(BaseModel):
-    rowid = RowIDField()
-
-    owner = ForeignKeyField(Teacher, null=True)
-    floor = IntegerField()
-    name = CharField(64)
-
-    @property
-    def number(self):
-        return self.rowid
+    number = IntegerField(primary_key=True)
 
 
 # #################################################################################################################### #
@@ -162,40 +147,15 @@ class CVPItem(BaseModel):
 class User(BaseModel):
     rowid = RowIDField()
 
-    invite = DeferredForeignKey('Invite', null=True)
-
     is_admin = BooleanField(default=False)
 
     group = ForeignKeyField(Group, null=True)
     teacher = ForeignKeyField(Teacher, null=True)
 
-    first_activity = DateTimeField(default=datetime.datetime.now)
-    last_activity = DateTimeField(default=datetime.datetime.now)
-
-    notification_flags = BitField()
-
-    notify_new_timetable = notification_flags.flag()
-    notify_timetable_changes = notification_flags.flag()
-
-    notify_first_pair_start = notification_flags.flag()
-    notify_pair_start = notification_flags.flag()
-    notify_first_pair_end = notification_flags.flag()
-    notify_pair_end = notification_flags.flag()
-
-    notify_new_cvp = notification_flags.flag()
-    notify_cvp_changes = notification_flags.flag()
-
-    notify_cvp_start = notification_flags.flag()
-    notify_cvp_end = notification_flags.flag()
-
-    pre_pair_start_time = IntegerField(default=0)
-    pre_cvp_start_time = IntegerField(default=0)
-
     @classmethod
     def from_telegram(cls, telegram_user):
         user = User.get_or_none(User.rowid == telegram_user.id)
         if user is not None:
-            user.last_activity = datetime.datetime.now()
             user.save()
             return user
 
@@ -209,14 +169,9 @@ class User(BaseModel):
 class Invite(BaseModel):
     rowid = RowIDField()
 
-    author = ForeignKeyField(User)
     set_group = ForeignKeyField(Group, null=True)
     set_teacher = ForeignKeyField(Teacher, null=True)
     set_admin = BooleanField(default=False)
-
-    @property
-    def is_used(self):
-        return User.select().where(User.invite == self).exists()
 
 
 # #################################################################################################################### #
@@ -242,7 +197,7 @@ class StorageData(BaseModel):
 
 DeferredForeignKey.resolve(Invite)
 db.create_tables((
-    Teacher, Group, Cabinet, PairNameFix,
+    Teacher, Group, Cabinet,
     Pair, Pair.teachers.through_model, Pair.cabinets.through_model, PairTime,
     CVPItem,
     User, Invite,

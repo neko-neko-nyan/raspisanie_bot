@@ -29,7 +29,7 @@ def create_invite(user, data=None, user_data=None):
     if "teacher" in user_data:
         data["tei"] = get_teacher_or_bot_error(user, user_data["teacher"]).rowid
 
-    invite = Invite.create(author=user, set_group=data.get("gri"), set_teacher=data.get("tei"), set_admin=set_admin)
+    invite = Invite.create(set_group=data.get("gri"), set_teacher=data.get("tei"), set_admin=set_admin)
     code = encode_invite(INVITE_SIGN_KEY, invite.rowid)
     link = f"https://t.me/nkrp_bot?start={code}"
 
