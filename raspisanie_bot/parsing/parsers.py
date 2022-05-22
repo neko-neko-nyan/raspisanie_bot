@@ -24,7 +24,7 @@ GroupName = collections.namedtuple('GroupName', ('course', 'group', 'subgroup'))
 class ParserBase:
     SPACES_RE = re.compile('\\s+')
     NOT_DIGITS_RE = re.compile('\\D+')
-    GROUP_NAME_RE = re.compile('\\s*(\\d)\\s*-?\\s*([А-Я]{1,2})\\s*-?\\s*(\\d)\\s*', re.MULTILINE)
+    GROUP_NAME_RE = re.compile('\\s*(\\d)\\s*-?\\s*([А-Я]{1,3})\\s*-?\\s*(\\d)\\s*', re.MULTILINE)
     TIME_PERIOD_RE = re.compile('\\s*с?\\s*(\\d+)[.,:](\\d+)\\s*(?:до|.)\\s*(\\d+)[.,:](\\d+)\\s*(.*)')
 
     NOT_WORD_RE = re.compile('\\W+')
