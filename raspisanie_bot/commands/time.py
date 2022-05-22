@@ -1,13 +1,11 @@
 import aiogram
 from aiogram.dispatcher import FSMContext
 
-from ..database import User, PairTime
+from ..database import PairTime
 from ..message_builder import MessageBuilder
 
 
 async def cmd_time(message: aiogram.types.Message, state: FSMContext):
-    User.from_telegram(message.from_user)
-
     res = MessageBuilder()
     for i in PairTime.select():
         if i.is_current:

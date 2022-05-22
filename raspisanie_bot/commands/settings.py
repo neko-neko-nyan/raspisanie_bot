@@ -6,7 +6,6 @@ from aiogram.utils.callback_data import CallbackData
 
 from ..bot_utils import get_group_or_bot_error, get_teacher_or_bot_error
 from ..message_builder import MessageBuilder
-from ..config import feature_enabled
 from ..database import User
 
 settings_cb = CallbackData("settings", "action")
@@ -19,9 +18,6 @@ async def cmd_settings(message: aiogram.types.Message, state: FSMContext):
 
     kb.add(InlineKeyboardButton("Студент", callback_data=settings_cb.new("set_group")),
            InlineKeyboardButton("Преподаватель", callback_data=settings_cb.new("set_teacher")))
-
-    if feature_enabled("settings_notifications"):
-        kb.add(InlineKeyboardButton("Уведомления", callback_data=settings_cb.new("notifications")))
 
     res = MessageBuilder().text("Тип: ")
     if user.group:
@@ -78,10 +74,6 @@ async def msg_settings_set_teacher(message: aiogram.types.Message, state: FSMCon
     await state.finish()
 
 
-async def cc_settings_notifications(call: aiogram.types.CallbackQuery):
-    await call.answer("В разработке notifications", show_alert=True)
-
-
 def install_settings(dp, all_commands):
     dp.register_message_handler(cmd_settings, commands="settings", state='*')
     all_commands.append(aiogram.types.BotCommand("/settings", "Настройки"))
@@ -90,6 +82,3 @@ def install_settings(dp, all_commands):
                                        settings_cb.filter(action=["set_group", "set_teacher"]))
     dp.register_message_handler(msg_settings_set_group, state=SettingsStates.waiting_for_group)
     dp.register_message_handler(msg_settings_set_teacher, state=SettingsStates.waiting_for_teacher)
-
-    if feature_enabled("settings_notifications"):
-        dp.register_callback_query_handler(cc_settings_notifications, settings_cb.filter(action=["notifications"]))

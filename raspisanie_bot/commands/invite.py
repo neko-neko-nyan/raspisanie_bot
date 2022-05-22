@@ -15,19 +15,10 @@ from ..database import Invite, User, Group, Teacher
 from ..encoded_invite import encode_invite
 
 
-def create_invite(user, data=None, user_data=None):
-    data = data or {}
-    user_data = user_data or {}
-
-    set_admin = user_data.get("admin", "false").lower() != "false" or data.get("isa", False)
+def create_invite(user, data):
+    set_admin = data.get("isa", False)
     if set_admin and not user.is_admin:
         bot_error("NOT_ADMIN", user=user)
-
-    if "group" in user_data:
-        data["gri"] = get_group_or_bot_error(user, user_data["group"]).rowid
-
-    if "teacher" in user_data:
-        data["tei"] = get_teacher_or_bot_error(user, user_data["teacher"]).rowid
 
     invite = Invite.create(set_group=data.get("gri"), set_teacher=data.get("tei"), set_admin=set_admin)
     code = encode_invite(INVITE_SIGN_KEY, invite.rowid)
@@ -92,7 +83,17 @@ async def cmd_invite(message: aiogram.types.Message, state: FSMContext):
 
     if args:
         args = dict(((*i.split('=', 1), "true")[:2] for i in args))
-        file, link = create_invite(user, user_data=args)
+        data = {}
+        if args.get("admin", "false").lower() != "false":
+            data["isa"] = True
+
+        if "group" in args:
+            data["gri"] = get_group_or_bot_error(user, args["group"]).rowid
+
+        if "teacher" in args:
+            data["tei"] = get_teacher_or_bot_error(user, args["teacher"]).rowid
+
+        file, link = create_invite(user, data)
         await message.answer_photo(file, link)
         await state.reset_state()
 

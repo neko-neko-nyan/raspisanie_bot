@@ -1,7 +1,6 @@
 from .admin import install_admin
 from .invite import install_invite
 from .my import install_my
-from .report import install_report
 from .search import install_search
 from .time import install_time
 from .settings import install_settings
@@ -15,7 +14,6 @@ def install_all_commands(dp):
     install_my(dp, all_commands)
     install_search(dp, all_commands)
     install_time(dp, all_commands)
-    install_report(dp, all_commands)
     install_invite(dp, all_commands)
     install_settings(dp, all_commands)
     install_start(dp, all_commands)

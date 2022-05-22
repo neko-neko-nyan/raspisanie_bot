@@ -15,10 +15,6 @@ HELP_TEXT = """\
 """
 
 
-async def send_help(message: aiogram.types.Message, user: User):
-    await message.answer(HELP_TEXT)
-
-
 async def cmd_start(message: aiogram.types.Message, state: FSMContext):
     user = User.from_telegram(message.from_user)
 
@@ -42,13 +38,12 @@ async def cmd_start(message: aiogram.types.Message, state: FSMContext):
         user.save()
         await message.reply("Код приглашения активирован успешно")
 
-    await send_help(message, user)
+    await message.answer(HELP_TEXT)
     await state.reset_state()
 
 
 async def cmd_help(message: aiogram.types.Message, state: FSMContext):
-    user = User.from_telegram(message.from_user)
-    await send_help(message, user)
+    await message.answer(HELP_TEXT)
     await state.reset_state()
 
 
