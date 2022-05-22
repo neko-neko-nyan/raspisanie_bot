@@ -5,6 +5,7 @@ BOT_DIR = pathlib.Path(__file__).parent.parent
 
 config = json.loads((BOT_DIR / "config.json").read_text())
 _features = None
+_replace_pair_names = None
 
 INVITE_SIGN_KEY = config.get("INVITE_SIGN_KEY", "").encode()
 JWT_KEY_FOR_ERRORS = config.get("JWT_KEY_FOR_ERRORS", "").encode()
@@ -19,3 +20,11 @@ def feature_enabled(name):
         _features = config.get("enable_features", {})
 
     return bool(_features.get(name, False))
+
+
+def get_pair_name(name):
+    global _replace_pair_names
+    if _replace_pair_names is None:
+        _replace_pair_names = config.get("replace_pair_names", {})
+
+    return _replace_pair_names.get(name, name)

@@ -4,6 +4,8 @@ import pathlib
 from peewee import *
 from playhouse.sqlite_ext import SqliteExtDatabase, RowIDField
 
+from .config import config
+
 db = SqliteExtDatabase(pathlib.Path(__file__).parent.parent / "database.sqlite", pragmas=(
     ('cache_size', -1024 * 64),  # 64MB page-cache.
     ('encoding', '\'UTF-8\''),
@@ -40,6 +42,11 @@ class Teacher(BaseModel):
     def short_name(self):
         return f"{self.surname} {self.name[0]}. {self.patronymic[0]}."
 
+    class Meta:
+        indexes = (
+            (('surname', 'name', 'patronymic'), True),
+        )
+
 
 class Group(BaseModel):
     rowid = RowIDField()
@@ -54,6 +61,11 @@ class Group(BaseModel):
             return self.group.upper()
 
         return f"{self.course}-{self.group.upper()}-{self.subgroup}"
+
+    class Meta:
+        indexes = (
+            (('course', 'group', 'subgroup'), True),
+        )
 
 
 class Cabinet(BaseModel):
@@ -203,3 +215,21 @@ db.create_tables((
     User, Invite,
     StorageState, StorageData
 ))
+
+
+def preload_persistent():
+    from .parsing import parse_group_name
+
+    cabinets = config.get("cabinets")
+    if cabinets:
+        Cabinet.insert_many(((i, ) for i in cabinets), fields=[Cabinet.number]).on_conflict_ignore().execute()
+
+    groups = config.get("groups")
+    if groups:
+        Group.insert_many((parse_group_name(i) for i in groups), fields=[Group.course, Group.group, Group.subgroup])\
+            .on_conflict_ignore().execute()
+
+    teachers = config.get("teachers")
+    if teachers:
+        Teacher.insert_many(teachers, fields=[Teacher.surname, Teacher.name, Teacher.patronymic]).on_conflict_ignore()\
+            .execute()

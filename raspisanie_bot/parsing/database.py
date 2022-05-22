@@ -3,7 +3,7 @@ import datetime
 import peewee
 
 from .parsers import Finder, Handler, SubpagesParsingHandler
-from ..config import feature_enabled
+from ..config import feature_enabled, get_pair_name
 from ..database import Cabinet, Teacher, Group, Pair, PairTime, CVPItem
 
 
@@ -42,13 +42,7 @@ class DatabaseFinder(Finder):
 
     def find_pair(self, text):
         text = super().find_pair(text)
-
-        # TODO: pair name fix (config)
-        # fix = PairNameFix.get_or_none(PairNameFix.prev_name == text)
-        # if fix:
-        #     return fix.new_name
-
-        return text
+        return get_pair_name(text)
 
 
 class DatabaseHandler(Handler):
