@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="database.sqlite">
-  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.39">
+  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.40">
     <root id="1">
       <ServerVersion>3.34.0</ServerVersion>
     </root>
@@ -1378,6 +1378,7 @@
     <key id="511" parent="491">
       <ColNames>rowid</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>rowid</UnderlyingIndexColNames>
     </key>
     <column id="512" parent="492" name="rowid">
       <DataType>INTEGER|0s</DataType>
@@ -1415,6 +1416,7 @@
     <key id="519" parent="492">
       <ColNames>rowid</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>rowid</UnderlyingIndexColNames>
     </key>
     <column id="520" parent="493" name="rowid">
       <DataType>INTEGER|0s</DataType>
@@ -1451,6 +1453,7 @@
     <key id="527" parent="493">
       <ColNames>rowid</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>rowid</UnderlyingIndexColNames>
     </key>
     <column id="528" parent="494" name="rowid">
       <DataType>INTEGER|0s</DataType>
@@ -1502,6 +1505,7 @@
     <key id="539" parent="494">
       <ColNames>rowid</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>rowid</UnderlyingIndexColNames>
     </key>
     <column id="540" parent="495" name="rowid">
       <DataType>INTEGER|0s</DataType>
@@ -1545,6 +1549,7 @@ group_id</ColNames>
     <key id="548" parent="495">
       <ColNames>rowid</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>rowid</UnderlyingIndexColNames>
     </key>
     <column id="549" parent="496" name="id">
       <DataType>INTEGER|0s</DataType>
@@ -1587,6 +1592,7 @@ cabinet_id</ColNames>
     <key id="557" parent="496">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
     </key>
     <column id="558" parent="497" name="prev_name">
       <DataType>VARCHAR(64)|0s</DataType>
@@ -1649,6 +1655,7 @@ teacher_id</ColNames>
     <key id="570" parent="498">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
     </key>
     <column id="571" parent="499" name="pair_number">
       <DataType>INTEGER|0s</DataType>
@@ -1668,6 +1675,7 @@ teacher_id</ColNames>
     <key id="574" parent="499">
       <ColNames>pair_number</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>pair_number</UnderlyingIndexColNames>
     </key>
     <column id="575" parent="500" name="type">
       <DataType>text|0s</DataType>
@@ -1757,6 +1765,7 @@ key</ColNames>
     <key id="593" parent="503">
       <ColNames>rowid</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>rowid</UnderlyingIndexColNames>
     </key>
     <column id="594" parent="504" name="rowid">
       <DataType>INTEGER|0s</DataType>
@@ -1827,6 +1836,7 @@ key</ColNames>
     <key id="609" parent="504">
       <ColNames>rowid</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>rowid</UnderlyingIndexColNames>
     </key>
   </database-model>
 </dataSource>
