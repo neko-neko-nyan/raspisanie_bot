@@ -207,10 +207,8 @@ class TimetableParser(ParserBase):
         if table[0].tag == 'tbody':
             table = table[0]
 
+        groups = [self.finder.find_group(gn.text_content()) for gn in table[0][1:]]
         skipped = {}  # pair_no -> [gi]
-        groups = []
-        for gn in table[0][1:]:
-            groups.append(self.finder.find_group(gn.text_content()))
 
         prev_pair = None
         for tr in table[1:]:
@@ -258,7 +256,7 @@ class TimetableParser(ParserBase):
     def parse_pair(self, date, group, pair_number, text):
         array = self.NOT_WORD_RE.sub(' ', text).strip().split()
         if not array:
-            return None
+            return
 
         teachers = []
         cabinets = []
@@ -282,8 +280,7 @@ class TimetableParser(ParserBase):
             while index < len(array):
                 cabinet = self.finder.find_cabinet(array[index])
                 if cabinet is None:
-                    index += 1
-                    continue
+                    break
 
                 cabinets.append(cabinet)
                 del array[index]
@@ -312,18 +309,16 @@ class TimetableParser(ParserBase):
 
         index = 2
         while index < len(array):
-            if len(array[index]) == 1 and len(array[index - 1]) == 1:
+            if len(array[index]) == 1 and len(array[index - 1]) == 1 \
+                    and array[index].isalpha() and array[index - 1].isalpha():
                 teacher = self.finder.find_teacher(array[index - 2], array[index - 1], array[index])
-                if teacher is None:
-                    index += 1
+                if teacher is not None:
+                    teachers.append(teacher)
+                    del array[index]
+                    del array[index - 1]
+                    del array[index - 2]
                     continue
-
-                teachers.append(teacher)
-                del array[index]
-                del array[index - 1]
-                del array[index - 2]
-            else:
-                index += 1
+            index += 1
 
         pair = self.finder.find_pair(' '.join(array))
         self.handler.handle_parsed_pair(date, group, pair_number, pair, teachers, cabinets, subgroup, is_substitution)
