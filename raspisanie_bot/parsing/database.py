@@ -73,6 +73,9 @@ class DatabaseHandler(Handler):
     def handle_parsed_pair(self, date, group, pair_number, pair, teachers, cabinets, subgroup, is_substitution):
         super().handle_parsed_pair(date, group, pair_number, pair, teachers, cabinets, subgroup, is_substitution)
 
+        if subgroup is not None:
+            pair = f"{pair} ({subgroup} группа)"
+
         pair = Pair(date=date, pair_number=pair_number, group=group, name=pair)
         pair.save()
 
