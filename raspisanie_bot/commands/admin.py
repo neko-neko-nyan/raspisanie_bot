@@ -11,7 +11,13 @@ async def cmd_admin(message: aiogram.types.Message, state: FSMContext):
     if not user.is_admin:
         bot_error("NOT_ADMIN", user=user)
 
-    await message.answer("В разработке admin")
+    arg = message.get_args()
+    if arg == "update":
+        from .. import bot_main
+        bot_main.UPDATE_SERVICE.force_update()
+        await message.answer("Обновление инициировано")
+    else:
+        await message.answer("В разработке admin")
     await state.reset_state()
 
 
