@@ -13,6 +13,7 @@ class UpdateService:
         self.updater = None
         self._do_force_update = False
         self._task = None
+        self._stopping = False
         self.timer = CancelableTimer()
 
     async def run(self):
@@ -20,7 +21,7 @@ class UpdateService:
         self.LOG.info("Starting first update...")
         force = True
 
-        while True:
+        while not self._stopping:
             try:
                 await self.updater.update_timetable(config.TIMETABLE_URL, force=force)
                 await self.updater.process_pending()
@@ -40,16 +41,19 @@ class UpdateService:
                 force = True
                 continue
 
-            self.LOG.info("Sleeping for %s seconds", delay)
-            canceled = not await self.timer.sleep(delay)
-
-            if canceled and not self._do_force_update:
+            if self._stopping:
                 break
 
+            self.LOG.info("Sleeping for %s seconds", delay)
+            await self.timer.sleep(delay)
+
+            if self._stopping:
+                break
+
+            force = self._do_force_update
             self._do_force_update = False
-            force = canceled
             if force:
-                self.LOG.info("Starting force update", delay)
+                self.LOG.info("Starting force update")
             else:
                 self.LOG.info("Starting by timer")
 
@@ -58,10 +62,10 @@ class UpdateService:
 
     def force_update(self):
         self._do_force_update = True
-        if self._task is not None:
-            self.timer.cancel()
+        self.timer.cancel()
 
     def stop(self, cancel_current=True):
+        self._stopping = True
         self.timer.cancel()
         if cancel_current and self._task is not None:
             self._task.cancel()
