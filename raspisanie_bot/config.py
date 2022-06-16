@@ -3,7 +3,7 @@ import pathlib
 
 BOT_DIR = pathlib.Path(__file__).parent.parent
 
-config = json.loads((BOT_DIR / "config.json").read_text())
+config = json.loads((BOT_DIR / "config.json").read_text(encoding="utf8"))
 _features = None
 _replace_pair_names = None
 
