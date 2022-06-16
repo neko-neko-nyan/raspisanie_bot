@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 from ..bot_errors import bot_error
 from ..bot_utils import get_group_or_none, get_teacher_or_none
-from ..database import User, Group, Cabinet, Teacher, Pair, PairTime
+from ..database import User, Group, Cabinet, Pair, PairTime
 from ..message_builder import MessageBuilder
 
 
@@ -36,9 +36,7 @@ async def do_search_query(message: aiogram.types.Message, user, search_type, tar
                                .where(Pair.teachers.through_model.teacher_id == target.rowid))
         allow_hide = is_allow_hide_pair_comp(Pair.teachers.through_model, Pair.teachers.through_model.teacher_id, query)
 
-    now = datetime.datetime.now()
-    in_pair, current_pair = PairTime.by_time(now)
-    today = now.date()
+    today = datetime.datetime.now().date()
 
     prev_date = None
     res = MessageBuilder()
@@ -49,10 +47,9 @@ async def do_search_query(message: aiogram.types.Message, user, search_type, tar
             prev_date = pair.date
 
         pair_time = PairTime.get_or_none(PairTime.pair_number == pair.pair_number)
-        if pair_time is not None:
-            res.time(pair_time.start_time).text(" - ").time(pair_time.end_time).raw(" ")
+        res.period(pair_time)
 
-        if pair.date == today and current_pair is not None and pair.pair_number == current_pair.pair_number:
+        if pair.date == today and pair_time is not None and pair_time.is_current:
             res.code(pair.pair_number)
         else:
             res.text(pair.pair_number)

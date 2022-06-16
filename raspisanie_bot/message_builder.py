@@ -27,6 +27,13 @@ class MessageBuilder:
             self.text(*value, escape=escape, quote=quote)
         return self
 
+    def period(self, start_time, end_time=None):
+        if start_time is None:
+            return self
+        if end_time is None:
+            start_time, end_time = start_time.start_time, start_time.end_time
+        return self.time(start_time).text(" - ").time(end_time).raw(" ")
+
     def raw(self, *value) -> 'MessageBuilder':
         self._parts.extend(value)
         return self

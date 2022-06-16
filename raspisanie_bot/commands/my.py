@@ -1,3 +1,5 @@
+import datetime
+
 import aiogram
 from aiogram.dispatcher import FSMContext
 
@@ -11,10 +13,7 @@ async def my_for_students(message: aiogram.types.Message, user, group):
 
     for pair in Pair.select().where(Pair.group == group).order_by(Pair.date, Pair.pair_number):
         pair_time = PairTime.get_or_none(PairTime.pair_number == pair.pair_number)
-        if pair_time is None:
-            results.append((pair.date, None, None, pair, pair_time))
-        else:
-            results.append((pair.date, pair_time.start_time, pair_time.end_time, pair, pair_time))
+        results.append((pair.date, None, None, pair, pair_time))
 
     for item in CVPItem.select().where(CVPItem.group == group).order_by(CVPItem.date):
         results.append((item.date, item.start_time, item.end_time, None, None))
@@ -24,29 +23,33 @@ async def my_for_students(message: aiogram.types.Message, user, group):
     prev_date = None
     res = MessageBuilder()
 
+    today = datetime.datetime.now().date()
+
     for date, start_time, end_time, pair, pair_time in results:
         if date != prev_date:
             res.underline().date(date).no_underline().nl()
             prev_date = date
 
-        if start_time is not None:
-            res.time(start_time).text(" - ").time(end_time).raw(" ")
-
         if pair is None:
-            res.bold("Столовая")
+            res.period(start_time, end_time)
+            res.bold("Столовая").nl()
+            continue
+
+        # pair_time = PairTime.get_or_none(PairTime.pair_number == pair.pair_number)
+        res.period(pair_time)
+
+        if pair.date == today and pair_time is not None and pair_time.is_current:
+            res.code(pair.pair_number)
         else:
-            if pair_time is not None and pair_time.is_current:
-                res.code(pair.pair_number)
-            else:
-                res.text(pair.pair_number)
+            res.text(pair.pair_number)
 
-            res.raw(" ").bold(pair.name)
+        res.raw(" ").bold(pair.name)
 
-            for i in pair.teachers:
-                res.text(" ", i.short_name)
+        for i in pair.teachers:
+            res.text(" ", i.short_name)
 
-            for i in pair.cabinets:
-                res.text(" ", i.number)
+        for i in pair.cabinets:
+            res.text(" ", i.number)
 
         res.nl()
 
@@ -58,6 +61,8 @@ async def my_for_teachers(message: aiogram.types.Message, user, teacher):
     prev_date = None
     res = MessageBuilder()
 
+    today = datetime.datetime.now().date()
+
     for pair in Pair.select().where(Pair.rowid.in_(
             Pair.teachers.through_model.select(Pair.teachers.through_model.pair_id)
                     .where(Pair.teachers.through_model.teacher_id == teacher.rowid)
@@ -67,17 +72,15 @@ async def my_for_teachers(message: aiogram.types.Message, user, teacher):
             prev_date = pair.date
 
         pair_time = PairTime.get_or_none(PairTime.pair_number == pair.pair_number)
-        if pair_time is not None:
-            res.time(pair_time.start_time).text(" - ").time(pair_time.end_time).raw(" ")
+        res.period(pair_time)
 
-            if pair_time.is_current:
-                res.code(pair.pair_number)
-            else:
-                res.text(pair.pair_number)
+        if pair.date == today and pair_time is not None and pair_time.is_current:
+            res.code(pair.pair_number)
         else:
             res.text(pair.pair_number)
 
-        res.raw(" ").bold(pair.name).text(" ", pair.group.string_value)
+        res.raw(' ').bold(pair.name)
+        res.text(" ", pair.group.string_value)
 
         for i in pair.cabinets:
             res.text(" ", i.number)
