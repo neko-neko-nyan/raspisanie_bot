@@ -139,7 +139,7 @@ class LinesConverter(pdfminer.converter.PDFLayoutAnalyzer):
                 continue
 
             if line.startswith("на "):
-                line = line.removeprefix("на").strip()
+                line = line[2:].strip()
                 date = self.parser.parse_date(line)
                 self.parser.handler.handle_new_cvp_date(date)
                 continue
@@ -413,10 +413,10 @@ class Finder:
 
     def find_pair(self, text):
         if text.startswith('МДК'):
-            return 'МДК.' + '.'.join(text.removeprefix('МДК').strip().split())
+            return 'МДК.' + '.'.join(text[3:].strip().split())
 
         if text.startswith('МИДК'):
-            return 'МИДК.' + '.'.join(text.removeprefix('МИДК').strip().split())
+            return 'МИДК.' + '.'.join(text[4:].strip().split())
 
         return text
 
