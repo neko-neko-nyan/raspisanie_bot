@@ -7,19 +7,18 @@
   "TIMETABLE_URL": "http://novkrp.ru/raspisanie.htm",
 
   "enable_features": {
-    "admin": false,
-    "report": false,
-    "settings_notifications": false,
-
-    "debug_info": true,
+    "debug_info": false,
 
     "remove_old_data": false,
-    "preload_persist": true,
-    "always_preload_persist": false,
     "create_missing_persist": true,
 
-    "notifications": false,
-    "cvp_parse": true,
-    "cvp_data": true
-  }
+    "cvp_parse": true
+  },
+
+  "replace_pair_names": {},
+
+  "cabinets": [],
+
+  "teachers": [],
+  "groups": []
 }
